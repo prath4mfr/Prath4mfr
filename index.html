@@ -31,7 +31,7 @@
             z-index: 1;
         }
 
-        /* 3. Start Button */
+        /* 3. Start Button with Pop Effect */
         #start-btn {
             cursor: pointer;
             z-index: 20;
@@ -40,13 +40,13 @@
         }
         #start-btn:hover { transform: scale(1.15); }
 
-        /* 4. Name Overlay (Responsive Top-Right) */
+        /* 4. Name Overlay (Massive for PC, Responsive for Mobile) */
         #name-overlay {
             position: fixed;
             top: 5%;
             right: 2%;
-            width: 450px; 
-            max-width: 90vw; /* Keeps it within screen width on mobile */
+            width: 800px; /* Increased for PC */
+            max-width: 90vw; /* Safety net for all screens */
             z-index: 10;
             opacity: 0;
             transition: opacity 2s ease;
@@ -133,7 +133,7 @@
         /* 6. MOBILE SPECIFIC STYLES */
         @media only screen and (max-width: 768px) {
             #name-overlay {
-                width: 280px; /* Smaller for phones */
+                width: 300px; /* Perfect fit for mobile */
                 top: 4%;
                 right: 4%;
             }
@@ -141,21 +141,7 @@
                 bottom: 15px;
                 right: 15px;
                 padding: 10px;
-                border-radius: 14px;
             }
-            #album-art {
-                width: 40px;
-                height: 40px;
-            }
-            .song-name {
-                width: 90px;
-                font-size: 8px;
-            }
-            #volume-slider {
-                width: 50px;
-            }
-            .main-btn { width: 30px; height: 30px; }
-            .side-btn { width: 20px; height: 20px; }
         }
 
         /* 7. Lightbox */
