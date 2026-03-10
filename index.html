@@ -40,11 +40,11 @@
         }
         #start-btn:hover { transform: scale(1.18); }
 
-        /* 4. Name Overlay (Switched to Top-Right) */
+        /* 4. Name Overlay (Pushed Higher & Right) */
         #name-overlay {
             position: fixed;
-            top: 12%; 
-            right: 2%; /* Switched from left to right */
+            top: 8%; /* Even higher */
+            right: 2%;
             width: 600px;
             z-index: 10;
             opacity: 0;
@@ -52,11 +52,11 @@
             pointer-events: none;
         }
 
-        /* 5. Minimalist Player UI (Switched to Bottom-Left) */
+        /* 5. Minimalist Player UI (Bottom-Left) */
         #player-container {
             position: fixed;
             bottom: 30px;
-            left: 30px; /* Switched from right to left */
+            left: 30px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -87,12 +87,14 @@
         #album-art:hover { transform: scale(1.05); }
 
         .song-name {
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 600;
             margin-bottom: 15px;
             letter-spacing: 2px;
             text-transform: uppercase;
             opacity: 0.9;
+            text-align: center;
+            width: 180px; /* Constrain width for long titles */
         }
 
         #volume-slider {
@@ -124,7 +126,6 @@
 
         .side-btn { width: 35px; height: 35px; font-size: 12px; }
         .main-btn { width: 50px; height: 50px; font-size: 18px; background: rgba(255, 255, 255, 0.15); }
-
         .phys-btn:hover { background: rgba(255, 255, 255, 0.25); transform: translateY(-2px); }
 
         /* 6. Lightbox */
@@ -143,27 +144,24 @@
 <body>
 
     <img src="start.png" id="start-btn" alt="Start">
-
     <img src="currentsname.png" id="name-overlay" alt="Name">
 
     <video id="background-video" muted playsinline>
         <source src="currents.mp4" type="video/mp4">
     </video>
 
-    <audio id="bg-music">
-        <source src="nangs.mp3" type="audio/mpeg">
-    </audio>
+    <audio id="bg-music"></audio>
 
     <div id="player-container">
         <img src="currentscover.jpg" id="album-art" alt="Album Cover">
-        <span class="song-name">Nangs</span>
+        <span id="display-song-name" class="song-name">Nangs</span>
         
         <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.5">
 
         <div class="control-row">
-            <button class="phys-btn side-btn">«</button>
+            <button id="prev-btn" class="phys-btn side-btn">«</button>
             <button id="toggle-btn" class="phys-btn main-btn">❚❚</button>
-            <button class="phys-btn side-btn">»</button>
+            <button id="next-btn" class="phys-btn side-btn">»</button>
         </div>
     </div>
 
@@ -172,6 +170,24 @@
     </div>
 
     <script>
+        const playlist = [
+            { name: "Let It Happen", file: "letithappen.mp3" },
+            { name: "Nangs", file: "nangs.mp3" },
+            { name: "The Moment", file: "themoment.mp3" },
+            { name: "Yes I'm Changing", file: "yesimchanging.mp3" },
+            { name: "Eventually", file: "eventually.mp3" },
+            { name: "Gossip", file: "gossip.mp3" },
+            { name: "The Less I Know The Better", file: "thelessiknowthebetter.mp3" },
+            { name: "Past Life", file: "pastlife.mp3" },
+            { name: "Disciples", file: "disciples.mp3" },
+            { name: "'Cause I'm A Man", file: "causeimaman.mp3" },
+            { name: "Reality In Motion", file: "realityinmotion.mp3" },
+            { name: "Love/Paranoia", file: "loveparanoia.mp3" },
+            { name: "New Person, Same Old Mistakes", file: "newpersonsameoldmistakes.mp3" }
+        ];
+
+        let currentTrackIndex = 1; // Starts at Nangs
+
         const video = document.getElementById('background-video');
         const audio = document.getElementById('bg-music');
         const startBtn = document.getElementById('start-btn');
@@ -181,15 +197,24 @@
         const toggleBtn = document.getElementById('toggle-btn');
         const albumArt = document.getElementById('album-art');
         const lightbox = document.getElementById('lightbox');
+        const songLabel = document.getElementById('display-song-name');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
 
-        audio.volume = 0.5;
+        function loadTrack(index) {
+            currentTrackIndex = index;
+            audio.src = playlist[index].file;
+            songLabel.innerText = playlist[index].name;
+            audio.play();
+            toggleBtn.innerHTML = '❚❚';
+        }
 
         startBtn.addEventListener('click', function() {
             startBtn.style.display = 'none';
             video.style.display = 'block';
             player.classList.add('show-ui');
             video.play();
-            audio.play();
+            loadTrack(1); // Force start with Nangs
 
             video.addEventListener('timeupdate', function() {
                 if (video.currentTime > (video.duration / 2)) {
@@ -199,27 +224,26 @@
         });
 
         toggleBtn.addEventListener('click', () => {
-            if (audio.paused) {
-                audio.play();
-                toggleBtn.innerHTML = '❚❚';
-            } else {
-                audio.pause();
-                toggleBtn.innerHTML = '▶';
-            }
+            if (audio.paused) { audio.play(); toggleBtn.innerHTML = '❚❚'; }
+            else { audio.pause(); toggleBtn.innerHTML = '▶'; }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            let nextIndex = (currentTrackIndex + 1) % playlist.length;
+            loadTrack(nextIndex);
+        });
+
+        prevBtn.addEventListener('click', () => {
+            let prevIndex = (currentTrackIndex - 1 + playlist.length) % playlist.length;
+            loadTrack(prevIndex);
         });
 
         albumArt.addEventListener('click', () => lightbox.classList.add('show-lightbox'));
         lightbox.addEventListener('click', () => lightbox.classList.remove('show-lightbox'));
-
-        volumeSlider.addEventListener('input', function() {
-            audio.volume = this.value;
-        });
-
+        volumeSlider.addEventListener('input', function() { audio.volume = this.value; });
+        
         video.loop = false;
-        video.onended = function() {
-            video.pause();
-        };
+        video.onended = () => video.pause();
     </script>
-
 </body>
 </html>
