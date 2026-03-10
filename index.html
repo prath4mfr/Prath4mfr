@@ -35,37 +35,37 @@
         #start-btn {
             cursor: pointer;
             z-index: 20;
-            max-width: 120px;
+            max-width: 110px;
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        #start-btn:hover { transform: scale(1.18); }
+        #start-btn:hover { transform: scale(1.15); }
 
         /* 4. Name Overlay (Top-Right) */
         #name-overlay {
             position: fixed;
             top: 5%;
             right: 2%;
-            width: 500px; /* Scaled slightly with player */
+            width: 450px; 
             z-index: 10;
             opacity: 0;
             transition: opacity 2s ease;
             pointer-events: none;
         }
 
-        /* 5. Minimalist Compact Player UI (Bottom-Left) */
+        /* 5. Micro Player UI (Bottom-Right) */
         #player-container {
             position: fixed;
-            bottom: 25px;
-            left: 25px;
+            bottom: 20px;
+            right: 20px; /* Back to Right */
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            padding: 15px 18px; /* Reduced padding */
-            border-radius: 22px; /* Smoother corners for smaller size */
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 12px 15px; /* Minimal padding */
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
             z-index: 15;
             color: white;
             opacity: 0;
@@ -76,10 +76,10 @@
         .show-ui { opacity: 1 !important; display: flex !important; }
 
         #album-art {
-            width: 60px; /* Smaller Art */
-            height: 60px;
-            border-radius: 8px;
-            margin-bottom: 8px;
+            width: 50px; /* Micro size */
+            height: 50px;
+            border-radius: 6px;
+            margin-bottom: 6px;
             object-fit: cover;
             cursor: pointer;
             transition: transform 0.3s ease;
@@ -87,37 +87,37 @@
         #album-art:hover { transform: scale(1.05); }
 
         .song-name {
-            font-size: 10px; /* Smaller Text */
+            font-size: 9px; /* Tiny text */
             font-weight: 600;
-            margin-bottom: 12px;
-            letter-spacing: 1.5px;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
             text-transform: uppercase;
-            opacity: 0.8;
+            opacity: 0.7;
             text-align: center;
-            width: 140px;
+            width: 120px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
         #volume-slider {
-            width: 80px; /* Narrower Slider */
+            width: 70px; /* Narrower */
             height: 2px;
             cursor: pointer;
             accent-color: #fff;
-            margin-bottom: 15px;
-            opacity: 0.6;
+            margin-bottom: 12px;
+            opacity: 0.5;
         }
 
         .control-row {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .phys-btn {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 50%;
             display: flex;
             justify-content: center;
@@ -127,9 +127,9 @@
             color: white;
         }
 
-        .side-btn { width: 28px; height: 28px; font-size: 10px; }
-        .main-btn { width: 40px; height: 40px; font-size: 14px; background: rgba(255, 255, 255, 0.12); }
-        .phys-btn:hover { background: rgba(255, 255, 255, 0.2); transform: translateY(-1px); }
+        .side-btn { width: 24px; height: 24px; font-size: 9px; }
+        .main-btn { width: 34px; height: 34px; font-size: 12px; background: rgba(255, 255, 255, 0.1); }
+        .phys-btn:hover { background: rgba(255, 255, 255, 0.15); transform: translateY(-1px); }
 
         /* 6. Lightbox */
         #lightbox {
@@ -139,7 +139,7 @@
             display: none; justify-content: center; align-items: center;
             z-index: 100; cursor: zoom-out; opacity: 0; transition: opacity 0.5s ease;
         }
-        #lightbox img { max-width: 80%; max-height: 80%; border-radius: 8px; }
+        #lightbox img { max-width: 75%; max-height: 75%; border-radius: 6px; }
         .show-lightbox { display: flex !important; opacity: 1 !important; }
     </style>
 </head>
@@ -247,7 +247,6 @@
         video.loop = false;
         video.onended = () => video.pause();
 
-        // Auto-play next track
         audio.onended = () => {
             let nextIndex = (currentTrackIndex + 1) % playlist.length;
             loadTrack(nextIndex);
