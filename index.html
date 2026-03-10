@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Currents Hub</title>
+    <title>Home</title>
+    <link rel="icon" type="image/jpeg" href="ballicon.jpg">
+    
     <style>
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
@@ -156,7 +158,7 @@
         ];
 
         let currentTrackIndex = 1;
-        let glassLocked = false; // Flag to keep background permanent
+        let glassLocked = false; 
         
         const video = document.getElementById('background-video');
         const audio = document.getElementById('bg-music');
@@ -187,18 +189,16 @@
             loadTrack(1);
 
             video.addEventListener('timeupdate', () => {
-                // Reveal PNGs at half-time
                 if (video.currentTime > (video.duration / 2)) {
                     nameImg.style.opacity = "1";
                     navSidebar.style.opacity = "1";
                 }
                 
-                // Trigger Glass Background 6s before end
                 if (video.currentTime > (video.duration - 6)) {
                     if (!glassLocked) {
                         nameImg.classList.add('final-border');
                         navSidebar.classList.add('final-border');
-                        glassLocked = true; // Prevents removal on loop
+                        glassLocked = true; 
                     }
                 }
             });
