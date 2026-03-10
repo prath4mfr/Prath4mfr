@@ -52,8 +52,14 @@
         Your browser does not support the video tag.
     </video>
 
+    <audio id="bg-music">
+        <source src="nangs.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
     <script>
         const video = document.getElementById('background-video');
+        const audio = document.getElementById('bg-music');
         const btn = document.getElementById('start-btn');
 
         btn.addEventListener('click', function() {
@@ -63,12 +69,16 @@
             // 2. Show and play the video
             video.style.display = 'block';
             video.play();
+
+            // 3. Play the music
+            audio.play();
         });
 
         // Ensure video stays on the last frame
         video.loop = false;
         video.onended = function() {
             video.pause();
+            // Note: The music will keep playing unless you want it to stop too.
         };
     </script>
 
