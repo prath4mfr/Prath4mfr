@@ -23,63 +23,70 @@
         }
         #start-btn:hover { transform: scale(1.15); }
 
-        /* Name Overlay - Small & Deep in Corner */
+        /* Name Overlay - Extreme Corner */
         #name-overlay {
             position: fixed;
             top: 10px; right: 10px;
             width: 450px; max-width: 70vw;
             z-index: 10; opacity: 0;
-            transition: opacity 2s ease, border 3s ease, background 3s ease;
             pointer-events: none;
-            padding: 12px;
-            border: 1px solid rgba(255, 255, 255, 0); 
-            border-radius: 40px; 
+            padding: 15px;
+            border-radius: 40px;
+            border: 1px solid transparent;
+            transition: opacity 2s ease, border 2s ease;
         }
 
-        /* Nav Sidebar - Balanced & MASSIVE */
+        /* Nav Sidebar - Balanced & Huge */
         #nav-sidebar {
             position: fixed;
             left: 40px; top: 50%;
             transform: translateY(-50%);
-            display: flex; flex-direction: column; gap: 40px; 
+            display: flex; flex-direction: column; 
+            align-items: center; gap: 40px; 
             z-index: 15; opacity: 0;
-            transition: opacity 2s ease, border 3s ease, background 3s ease;
-            padding: 40px;
-            border: 1px solid rgba(255, 255, 255, 0); 
-            border-radius: 60px; 
+            padding: 50px;
+            border-radius: 60px;
+            border: 1px solid transparent;
+            transition: opacity 2s ease, border 2s ease;
         }
 
+        /* Perfectly Balanced Icons */
         .nav-icon {
-            width: 150px; /* Big & Equal */
-            height: auto; cursor: pointer;
+            width: 160px; /* Big & Equal */
+            height: auto; 
+            cursor: pointer;
             transition: transform 0.3s ease, filter 0.3s ease;
             display: block;
         }
-        .nav-icon:hover { transform: scale(1.05); filter: brightness(1.2); }
+        .nav-icon:hover { transform: scale(1.08); filter: brightness(1.2); }
 
-        /* Animated Milky/Mirror Effect */
+        /* FIXED ANIMATION: The Milky Glass Effect */
         .final-border {
-            border: 1px solid rgba(255, 255, 255, 0.3) !important;
-            /* Shifting Gradient Background */
-            background: linear-gradient(-45deg, 
-                rgba(255, 255, 255, 0.1), 
-                rgba(200, 150, 255, 0.15), 
-                rgba(255, 255, 255, 0.1), 
-                rgba(150, 100, 255, 0.1)
+            border: 1px solid rgba(255, 255, 255, 0.4) !important;
+            background-image: linear-gradient(
+                45deg, 
+                rgba(255, 255, 255, 0.1) 25%, 
+                rgba(180, 140, 255, 0.2) 50%, 
+                rgba(255, 255, 255, 0.1) 75%
             ) !important;
-            background-size: 400% 400% !important;
-            animation: milkyMove 10s ease infinite;
-            backdrop-filter: blur(25px) brightness(1.1);
-            -webkit-backdrop-filter: blur(25px) brightness(1.1);
-            box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.1), 0 20px 50px rgba(0,0,0,0.7);
+            background-size: 200% 200% !important;
+            animation: milkyWay 6s linear infinite, glassPulse 4s ease-in-out infinite alternate !important;
+            backdrop-filter: blur(30px) brightness(1.2);
+            -webkit-backdrop-filter: blur(30px) brightness(1.2);
+            box-shadow: inset 0 0 40px rgba(255, 255, 255, 0.2), 0 20px 60px rgba(0,0,0,0.8);
         }
 
-        @keyframes milkyMove {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        @keyframes milkyWay {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 200% 200%; }
         }
 
+        @keyframes glassPulse {
+            from { background-color: rgba(255, 255, 255, 0.05); }
+            to { background-color: rgba(255, 255, 255, 0.15); }
+        }
+
+        /* Player - Bottom Right */
         #player-container {
             position: fixed; bottom: 20px; right: 20px;
             display: none; flex-direction: column; align-items: center;
@@ -89,21 +96,20 @@
             border: 1px solid rgba(255, 255, 255, 0.08); z-index: 15; color: white;
             opacity: 0; transition: opacity 1.5s ease;
         }
-
         .show-ui { opacity: 1 !important; display: flex !important; }
 
         #album-art { width: 45px; height: 45px; border-radius: 6px; margin-bottom: 6px; cursor: pointer; }
-        .song-name { font-size: 8px; font-weight: 600; margin-bottom: 10px; text-transform: uppercase; opacity: 0.6; }
+        .song-name { font-size: 8px; font-weight: 600; margin-bottom: 10px; text-transform: uppercase; opacity: 0.6; width: 100px; text-align: center; }
         #volume-slider { width: 60px; height: 2px; accent-color: #fff; margin-bottom: 12px; opacity: 0.4; }
         .control-row { display: flex; align-items: center; gap: 8px; }
         .phys-btn { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 50%; cursor: pointer; color: white; display: flex; justify-content: center; align-items: center; }
         .side-btn { width: 22px; height: 22px; font-size: 8px; }
-        .main-btn { width: 32px; height: 32px; font-size: 11px; background: rgba(255, 255, 255, 0.1); }
+        .main-btn { width: 32px; height: 32px; font-size: 11px; }
 
         @media only screen and (max-width: 768px) {
-            #name-overlay { width: 260px; top: 10px; right: 50%; transform: translateX(50%); border-radius: 30px; }
-            #nav-sidebar { left: 10px; padding: 20px; border-radius: 40px; gap: 30px; }
-            .nav-icon { width: 85px; }
+            #name-overlay { width: 260px; top: 10px; right: 50%; transform: translateX(50%); }
+            #nav-sidebar { left: 10px; padding: 20px; gap: 30px; }
+            .nav-icon { width: 90px; }
         }
     </style>
 </head>
@@ -178,11 +184,12 @@
             loadTrack(1);
 
             video.addEventListener('timeupdate', () => {
+                // HALF-WAY: Show the name and icons
                 if (video.currentTime > (video.duration / 2)) {
                     nameImg.style.opacity = "1";
                     navSidebar.style.opacity = "1";
                 }
-                // Mirrored "Glass" Loading - starts 5 seconds before end
+                // 5 SECONDS BEFORE END: The Milky Glass Animation kicks in
                 if (video.currentTime > (video.duration - 5)) {
                     nameImg.classList.add('final-border');
                     navSidebar.classList.add('final-border');
@@ -203,4 +210,4 @@
         audio.onended = () => loadTrack((currentTrackIndex + 1) % playlist.length);
     </script>
 </body>
-</html>
+</html>>
