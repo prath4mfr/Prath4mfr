@@ -40,10 +40,10 @@
         }
         #start-btn:hover { transform: scale(1.18); }
 
-        /* 4. Name Overlay (Pushed Higher & Right) */
+        /* 4. Name Overlay (Pushed even further up) */
         #name-overlay {
             position: fixed;
-            top: 8%; /* Even higher */
+            top: 5%; /* Higher up the screen */
             right: 2%;
             width: 600px;
             z-index: 10;
@@ -94,7 +94,7 @@
             text-transform: uppercase;
             opacity: 0.9;
             text-align: center;
-            width: 180px; /* Constrain width for long titles */
+            width: 180px;
         }
 
         #volume-slider {
@@ -138,7 +138,6 @@
         }
         #lightbox img { max-width: 85%; max-height: 85%; border-radius: 10px; }
         .show-lightbox { display: flex !important; opacity: 1 !important; }
-
     </style>
 </head>
 <body>
@@ -186,7 +185,7 @@
             { name: "New Person, Same Old Mistakes", file: "newpersonsameoldmistakes.mp3" }
         ];
 
-        let currentTrackIndex = 1; // Starts at Nangs
+        let currentTrackIndex = 1; // Start with Nangs
 
         const video = document.getElementById('background-video');
         const audio = document.getElementById('bg-music');
@@ -214,7 +213,7 @@
             video.style.display = 'block';
             player.classList.add('show-ui');
             video.play();
-            loadTrack(1); // Force start with Nangs
+            loadTrack(1); // Nangs
 
             video.addEventListener('timeupdate', function() {
                 if (video.currentTime > (video.duration / 2)) {
