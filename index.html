@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
-    <link rel="icon" type="image/jpeg" href="ballicon.png">
+    <link rel="icon" type="image/jpeg" href="ballicon.jpg">
     
     <style>
         body, html {
@@ -69,7 +69,7 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.4);
         }
 
-        /* Skip Button - Bottom Left */
+        /* Skip Button */
         #skip-btn {
             position: fixed;
             bottom: 25px;
@@ -88,8 +88,8 @@
             display: none;
             transition: opacity 1.5s ease, background 0.3s ease;
         }
-        #skip-btn:hover { background: rgba(255, 255, 255, 0.15); }
 
+        /* Player */
         #player-container {
             position: fixed; bottom: 20px; right: 20px;
             display: none; flex-direction: column; align-items: center;
@@ -102,7 +102,6 @@
         .show-ui { opacity: 1 !important; display: flex !important; }
 
         #album-art { width: 45px; height: 45px; border-radius: 6px; margin-bottom: 6px; cursor: pointer; transition: transform 0.3s ease; }
-        
         .song-name { font-size: 8px; font-weight: 600; margin-bottom: 10px; text-transform: uppercase; opacity: 0.6; width: 100px; text-align: center; }
         #volume-slider { width: 60px; height: 2px; accent-color: #fff; margin-bottom: 12px; opacity: 0.4; }
         .control-row { display: flex; align-items: center; gap: 8px; }
@@ -110,18 +109,12 @@
         .side-btn { width: 22px; height: 22px; font-size: 8px; }
         .main-btn { width: 32px; height: 32px; font-size: 11px; }
 
-        #art-viewer {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); backdrop-filter: blur(10px);
-            z-index: 100; display: none; justify-content: center; align-items: center;
-        }
-
         @media only screen and (max-width: 768px) {
-            #name-overlay { width: 320px; top: 20px; right: 50%; transform: translateX(50%); }
-            #nav-sidebar { left: 50%; top: 55%; transform: translate(-50%, -50%); padding: 40px; gap: 50px; border-radius: 50px; width: 80%; }
+            #name-overlay { width: 320px; top: 40px; right: 50%; transform: translateX(50%); }
+            #nav-sidebar { left: 50%; top: 45%; transform: translate(-50%, -50%); padding: 40px; gap: 50px; border-radius: 50px; width: 80%; }
             .nav-icon { width: 180px; } 
-            #player-container { right: 50%; transform: translateX(50%); bottom: 15px; }
-            #skip-btn { left: 50%; transform: translateX(-50%); bottom: 100px; } /* Mobile skip placement */
+            #player-container { right: 20px; bottom: 20px; transform: none; }
+            #skip-btn { left: 20px; bottom: 20px; transform: none; }
         }
     </style>
 </head>
@@ -131,17 +124,13 @@
     <button id="skip-btn">SKIP INTRO</button>
     <img src="currentsname.png" id="name-overlay">
 
-    <div id="art-viewer" onclick="this.style.display='none'">
-        <img src="currentscover.jpg">
-    </div>
-
     <div id="nav-sidebar">
         <a href="social.html"><img src="social.png" class="nav-icon"></a>
         <a href="art.html"><img src="art.png" class="nav-icon"></a>
         <a href="music.html"><img src="music.png" class="nav-icon"></a>
     </div>
 
-    <video id="background-video" muted playsinline loop>
+    <video id="background-video" muted playsinline>
         <source src="currents.mp4" type="video/mp4">
     </video>
 
@@ -196,27 +185,29 @@
             toggleBtn.innerHTML = '❚❚';
         }
 
+        // Custom loop logic to start from 3s
+        video.onended = () => {
+            video.currentTime = 3;
+            video.play();
+        };
+
         startBtn.addEventListener('click', () => {
             startBtn.style.display = 'none';
             video.style.display = 'block';
             player.classList.add('show-ui');
             
-            // Show skip button simultaneously with player
             skipBtn.style.display = 'block';
             setTimeout(() => { skipBtn.style.opacity = "1"; }, 10);
 
+            // Initial start from 3 seconds
+            video.currentTime = 3;
             video.play();
             loadTrack(1);
 
             video.addEventListener('timeupdate', () => {
-                // Speed logic
-                video.playbackRate = (video.currentTime < 3) ? 3.0 : 1.0;
-
-                // UI Reveal
                 if (video.currentTime > (video.duration / 2)) {
                     nameImg.style.opacity = "1";
                     navSidebar.style.opacity = "1";
-                    // Fade out skip button when elements arrive
                     skipBtn.style.opacity = "0";
                     setTimeout(() => { skipBtn.style.display = "none"; }, 1500);
                 }
@@ -231,9 +222,8 @@
             });
         });
 
-        // Skip logic
         skipBtn.addEventListener('click', () => {
-            video.currentTime = (video.duration / 2) + 0.5;
+            video.currentTime = (video.duration / 2) + 0.1;
             skipBtn.style.opacity = "0";
             setTimeout(() => { skipBtn.style.display = "none"; }, 1500);
         });
