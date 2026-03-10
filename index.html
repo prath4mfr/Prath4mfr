@@ -33,7 +33,8 @@
             padding: 15px;
             border-radius: 40px;
             border: 1px solid transparent;
-            transition: opacity 2s ease, border 2s ease;
+            /* Smooth transitions for the glass effect */
+            transition: opacity 2s ease, border 2.5s ease, background 2.5s ease, backdrop-filter 2.5s ease;
         }
 
         /* Nav Sidebar - Balanced & Huge */
@@ -47,12 +48,12 @@
             padding: 50px;
             border-radius: 60px;
             border: 1px solid transparent;
-            transition: opacity 2s ease, border 2s ease;
+            /* Smooth transitions for the glass effect */
+            transition: opacity 2s ease, border 2.5s ease, background 2.5s ease, backdrop-filter 2.5s ease;
         }
 
-        /* Perfectly Balanced Icons */
         .nav-icon {
-            width: 160px; /* Big & Equal */
+            width: 160px; /* Desktop Size */
             height: auto; 
             cursor: pointer;
             transition: transform 0.3s ease, filter 0.3s ease;
@@ -60,30 +61,13 @@
         }
         .nav-icon:hover { transform: scale(1.08); filter: brightness(1.2); }
 
-        /* FIXED ANIMATION: The Milky Glass Effect */
+        /* NEW: Normal Transparent Glass Background (Fades in smoothly) */
         .final-border {
-            border: 1px solid rgba(255, 255, 255, 0.4) !important;
-            background-image: linear-gradient(
-                45deg, 
-                rgba(255, 255, 255, 0.1) 25%, 
-                rgba(180, 140, 255, 0.2) 50%, 
-                rgba(255, 255, 255, 0.1) 75%
-            ) !important;
-            background-size: 200% 200% !important;
-            animation: milkyWay 6s linear infinite, glassPulse 4s ease-in-out infinite alternate !important;
-            backdrop-filter: blur(30px) brightness(1.2);
-            -webkit-backdrop-filter: blur(30px) brightness(1.2);
-            box-shadow: inset 0 0 40px rgba(255, 255, 255, 0.2), 0 20px 60px rgba(0,0,0,0.8);
-        }
-
-        @keyframes milkyWay {
-            0% { background-position: 0% 0%; }
-            100% { background-position: 200% 200%; }
-        }
-
-        @keyframes glassPulse {
-            from { background-color: rgba(255, 255, 255, 0.05); }
-            to { background-color: rgba(255, 255, 255, 0.15); }
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            background: rgba(255, 255, 255, 0.08) !important; /* Low opacity so it doesn't merge */
+            backdrop-filter: blur(15px); /* This makes the video visible but blurred inside the button */
+            -webkit-backdrop-filter: blur(15px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
         }
 
         /* Player - Bottom Right */
@@ -106,10 +90,11 @@
         .side-btn { width: 22px; height: 22px; font-size: 8px; }
         .main-btn { width: 32px; height: 32px; font-size: 11px; }
 
+        /* MOBILE FIXES */
         @media only screen and (max-width: 768px) {
-            #name-overlay { width: 260px; top: 10px; right: 50%; transform: translateX(50%); }
-            #nav-sidebar { left: 10px; padding: 20px; gap: 30px; }
-            .nav-icon { width: 90px; }
+            #name-overlay { width: 280px; top: 10px; right: 50%; transform: translateX(50%); }
+            #nav-sidebar { left: 15px; padding: 25px; gap: 35px; border-radius: 40px; }
+            .nav-icon { width: 120px; } /* BIGGER ON PHONE as requested */
         }
     </style>
 </head>
@@ -184,13 +169,13 @@
             loadTrack(1);
 
             video.addEventListener('timeupdate', () => {
-                // HALF-WAY: Show the name and icons
+                // HALF-WAY: Show the icons and name
                 if (video.currentTime > (video.duration / 2)) {
                     nameImg.style.opacity = "1";
                     navSidebar.style.opacity = "1";
                 }
-                // 5 SECONDS BEFORE END: The Milky Glass Animation kicks in
-                if (video.currentTime > (video.duration - 5)) {
+                // 6 SECONDS BEFORE END: Transparent border and glass effect fades in
+                if (video.currentTime > (video.duration - 6)) {
                     nameImg.classList.add('final-border');
                     navSidebar.classList.add('final-border');
                 }
@@ -210,4 +195,4 @@
         audio.onended = () => loadTrack((currentTrackIndex + 1) % playlist.length);
     </script>
 </body>
-</html>>
+</html>
