@@ -40,23 +40,23 @@
         }
         #start-btn:hover { transform: scale(1.18); }
 
-        /* 4. Name Overlay (Bigger & Pushed to far left) */
+        /* 4. Name Overlay (Switched to Top-Right) */
         #name-overlay {
             position: fixed;
-            top: 12%; /* Slightly higher */
-            left: 2%; /* Pushed closer to the edge */
-            width: 600px; /* Increased size */
+            top: 12%; 
+            right: 2%; /* Switched from left to right */
+            width: 600px;
             z-index: 10;
             opacity: 0;
             transition: opacity 2s ease;
             pointer-events: none;
         }
 
-        /* 5. Minimalist Player UI */
+        /* 5. Minimalist Player UI (Switched to Bottom-Left) */
         #player-container {
             position: fixed;
             bottom: 30px;
-            right: 30px;
+            left: 30px; /* Switched from right to left */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -70,8 +70,7 @@
             color: white;
             opacity: 0;
             transition: opacity 1.5s ease;
-            pointer-events: auto; /* Changed to auto for clickability */
-            display: none; /* Initially hidden */
+            display: none;
         }
 
         .show-ui { opacity: 1 !important; display: flex !important; }
@@ -185,7 +184,6 @@
 
         audio.volume = 0.5;
 
-        // Initial Start Action
         startBtn.addEventListener('click', function() {
             startBtn.style.display = 'none';
             video.style.display = 'block';
@@ -193,7 +191,6 @@
             video.play();
             audio.play();
 
-            // Fade in name after halfway through the video
             video.addEventListener('timeupdate', function() {
                 if (video.currentTime > (video.duration / 2)) {
                     nameImg.style.opacity = "1";
@@ -201,7 +198,6 @@
             });
         });
 
-        // Play/Pause Toggle Logic
         toggleBtn.addEventListener('click', () => {
             if (audio.paused) {
                 audio.play();
@@ -212,16 +208,13 @@
             }
         });
 
-        // Lightbox Open/Close
         albumArt.addEventListener('click', () => lightbox.classList.add('show-lightbox'));
         lightbox.addEventListener('click', () => lightbox.classList.remove('show-lightbox'));
 
-        // Volume Slider Control
         volumeSlider.addEventListener('input', function() {
             audio.volume = this.value;
         });
 
-        // Freeze video at last frame
         video.loop = false;
         video.onended = function() {
             video.pause();
