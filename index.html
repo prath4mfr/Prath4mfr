@@ -21,6 +21,7 @@
 
         /* GIF and Small Bubble Button Container */
         #start-container {
+            position: relative; /* For bubble positioning */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -46,16 +47,42 @@
             font-weight: 800;
             letter-spacing: 1px;
             box-shadow: 0 4px 10px rgba(255, 133, 162, 0.3);
-            animation: float 3s ease-in-out infinite;
+            animation: float-btn 3s ease-in-out infinite; /* Renamed animation to avoid conflict */
             text-transform: uppercase;
             border: none;
             cursor: pointer;
+            z-index: 21; /* Keep button above bubbles */
         }
 
-        @keyframes float {
+        @keyframes float-btn {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-8px); }
         }
+
+        /* Floating Bubble effect */
+        .floating-bubble {
+            position: absolute;
+            bottom: -50px; /* Start below the screen */
+            opacity: 0;
+            pointer-events: none;
+            animation: float-up 6s ease-out forwards; /* Longer animation for slower float */
+            z-index: 19; /* Below GIF and button */
+        }
+
+        @keyframes float-up {
+            0% {
+                transform: translateY(0) translateX(0) scale(0.2);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-120vh) translateX(var(--x-offset, 0px)) scale(var(--s-factor, 1));
+                opacity: 0;
+            }
+        }
+
 
         /* Name Overlay */
         #name-overlay {
@@ -98,7 +125,7 @@
             opacity: 0; display: none; transition: opacity 1.5s ease;
         }
 
-        /* Player - Fixed Original Design */
+        /* Player */
         #player-container {
             position: fixed; bottom: 20px; right: 20px;
             display: none; flex-direction: column; align-items: center;
@@ -141,7 +168,7 @@
 
     <div id="start-container">
         <img src="start.gif" id="start-gif">
-        <button id="bubble-btn">CLICK</button>
+        <button id="bubble-btn">ENTER</button>
     </div>
 
     <button id="skip-btn">SKIP INTRO</button>
@@ -193,6 +220,7 @@
 
         let currentTrackIndex = 1;
         let glassLocked = false; 
+        let bubbleInterval; // To clear interval later
         
         const video = document.getElementById('background-video');
         const audio = document.getElementById('bg-music');
@@ -221,7 +249,46 @@
             video.play();
         };
 
+        // Function to create and animate a bubble
+        function createBubble() {
+            const bubble = document.createElement('img');
+            bubble.src = 'bubble.png';
+            bubble.classList.add('floating-bubble');
+            
+            const size = Math.random() * (100 - 30) + 30; // Random size between 30px and 100px
+            bubble.style.width = `${size}px`;
+            bubble.style.height = `${size}px`;
+            
+            const startX = Math.random() * (window.innerWidth - size);
+            bubble.style.left = `${startX}px`;
+            
+            // Random horizontal drift for bubbles
+            const xOffset = Math.random() * 400 - 200; // -200px to +200px drift
+            bubble.style.setProperty('--x-offset', `${xOffset}px`);
+            bubble.style.setProperty('--s-factor', `${Math.random() * (1.5 - 0.5) + 0.5}`); // Random scale factor
+
+            startContainer.appendChild(bubble);
+
+            bubble.addEventListener('animationend', () => {
+                bubble.remove();
+            });
+        }
+
+        // Start bubble generation when the page loads
+        bubbleInterval = setInterval(createBubble, 500); // Create a new bubble every 0.5 seconds
+
+
         startContainer.addEventListener('click', () => {
+            clearInterval(bubbleInterval); // Stop generating new bubbles
+            // Remove existing bubbles with a fade-out
+            document.querySelectorAll('.floating-bubble').forEach(bubble => {
+                bubble.style.animation = 'none'; // Stop current animation
+                bubble.style.transition = 'opacity 1s ease-out';
+                bubble.style.opacity = '0';
+                setTimeout(() => bubble.remove(), 1000);
+            });
+
+
             startContainer.style.display = 'none';
             video.style.display = 'block';
             player.classList.add('show-ui');
