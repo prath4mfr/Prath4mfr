@@ -6,15 +6,31 @@
     <title>Home</title>
     <link rel="icon" type="image/png" href="ballicon.png">
     <style>
-        /* Essential CSS for smoothness */
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #000; display: flex; justify-content: center; align-items: center; font-family: sans-serif; }
-        #background-video { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; display: block; background: #000; }
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            overflow: hidden; background-color: #000; 
+            display: flex; justify-content: center; align-items: center; 
+            font-family: sans-serif; 
+        }
+
+        /* The zoomable container */
+        #main-viewport {
+            width: 100%; height: 100%; transition: transform 0.3s ease;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        #background-video { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
         
         .top-left-controls { position: fixed; top: 10px; left: 10px; z-index: 100; display: flex; flex-direction: column; gap: 8px; }
-        .icon-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: white; padding: 8px; border-radius: 8px; cursor: pointer; backdrop-filter: blur(10px); width: 35px; height: 35px; opacity: 0.6; }
+        .icon-btn { 
+            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); 
+            color: white; padding: 8px; border-radius: 8px; cursor: pointer; 
+            backdrop-filter: blur(10px); width: 35px; height: 35px; opacity: 0.6; 
+            display: flex; align-items: center; justify-content: center; font-size: 14px;
+        }
 
-        #name-overlay { position: fixed; top: 20px; right: 20px; width: 480px; max-width: 85vw; z-index: 15; opacity: 0; display: none; padding: 20px; border-radius: 40px; transition: opacity 2s, border 2.5s, background 2.5s; }
-        #nav-sidebar { position: fixed; left: 30px; top: 50%; transform: translateY(-50%); display: none; flex-direction: column; align-items: center; gap: 50px; z-index: 15; opacity: 0; padding: 60px 40px; border-radius: 60px; transition: opacity 2s, border 2.5s, background 2.5s; }
+        #name-overlay { position: fixed; top: 20px; right: 20px; width: 480px; max-width: 85vw; z-index: 15; opacity: 0; display: none; padding: 20px; border-radius: 40px; transition: opacity 2s, border 2.5s; }
+        #nav-sidebar { position: fixed; left: 30px; top: 50%; transform: translateY(-50%); display: none; flex-direction: column; align-items: center; gap: 50px; z-index: 15; opacity: 0; padding: 60px 40px; border-radius: 60px; transition: opacity 2s, border 2.5s; }
         .nav-icon { width: 180px; height: auto; cursor: pointer; }
         .final-border { border: 1px solid rgba(255, 255, 255, 0.2) !important; background: rgba(255, 255, 255, 0.08) !important; backdrop-filter: blur(15px); }
 
@@ -37,42 +53,47 @@
     </style>
 </head>
 <body>
-    <video id="background-video" muted playsinline preload="auto">
-        <source src="currents.mp4" type="video/mp4">
-    </video>
 
-    <div class="top-left-controls">
-        <button id="fs-toggle" class="icon-btn">⛶</button>
-        <button id="back-btn" class="icon-btn" onclick="window.location.href='index.html'">⇠</button>
-    </div>
+    <div id="main-viewport">
+        <video id="background-video" muted playsinline preload="auto">
+            <source src="currents.mp4" type="video/mp4">
+        </video>
 
-    <button id="skip-btn">SKIP INTRO</button>
-    <img src="currentsname.png" id="name-overlay">
-
-    <div id="nav-sidebar">
-        <a href="social.html"><img src="social.png" class="nav-icon"></a>
-        <a href="art.html"><img src="art.png" class="nav-icon"></a>
-        <a href="music.html"><img src="music.png" class="nav-icon"></a>
-    </div>
-
-    <div id="album-modal" onclick="this.style.display='none'"><img src="currentscover.jpg"></div>
-    <audio id="bg-music" preload="auto"></audio>
-
-    <div id="music-controls-wrapper">
-        <div id="player-container">
-            <img src="currentscover.jpg" id="album-art" style="width:45px; border-radius:6px; cursor:pointer;" onclick="document.getElementById('album-modal').style.display='flex'">
-            <div class="time-container"><span id="time-current">0:00</span><span id="time-total">0:00</span></div>
-            <input type="range" id="music-progress" min="0" max="100" value="0">
-            <span id="display-song-name" class="song-name">Nangs</span>
-            <div style="display:flex; gap:8px;">
-                <button id="prev-btn" class="phys-btn side-btn">«</button>
-                <button id="toggle-btn" class="phys-btn main-btn">❚❚</button>
-                <button id="next-btn" class="phys-btn side-btn">»</button>
-            </div>
+        <div class="top-left-controls">
+            <button id="fs-toggle" class="icon-btn">⛶</button>
+            <button id="zoom-in" class="icon-btn">+</button>
+            <button id="zoom-out" class="icon-btn">−</button>
+            <button id="back-btn" class="icon-btn" onclick="window.location.href='index.html'">⇠</button>
         </div>
-        <div id="volume-container">
-            <input type="range" id="volume-slider" min="0" max="1" step="0.01">
-            <span style="font-size:10px; margin-top:8px; opacity:0.5;">🔊</span>
+
+        <button id="skip-btn">SKIP INTRO</button>
+        <img src="currentsname.png" id="name-overlay">
+
+        <div id="nav-sidebar">
+            <a href="social.html"><img src="social.png" class="nav-icon"></a>
+            <a href="art.html"><img src="art.png" class="nav-icon"></a>
+            <a href="music.html"><img src="music.png" class="nav-icon"></a>
+        </div>
+
+        <div id="album-modal" onclick="this.style.display='none'"><img src="currentscover.jpg"></div>
+        <audio id="bg-music" preload="auto"></audio>
+
+        <div id="music-controls-wrapper">
+            <div id="player-container">
+                <img src="currentscover.jpg" id="album-art" style="width:45px; border-radius:6px; cursor:pointer;" onclick="document.getElementById('album-modal').style.display='flex'">
+                <div class="time-container"><span id="time-current">0:00</span><span id="time-total">0:00</span></div>
+                <input type="range" id="music-progress" min="0" max="100" value="0">
+                <span id="display-song-name" class="song-name">Nangs</span>
+                <div style="display:flex; gap:8px;">
+                    <button id="prev-btn" class="phys-btn side-btn">«</button>
+                    <button id="toggle-btn" class="phys-btn main-btn">❚❚</button>
+                    <button id="next-btn" class="phys-btn side-btn">»</button>
+                </div>
+            </div>
+            <div id="volume-container">
+                <input type="range" id="volume-slider" min="0" max="1" step="0.01">
+                <span style="font-size:10px; margin-top:8px; opacity:0.5;">🔊</span>
+            </div>
         </div>
     </div>
 
@@ -90,19 +111,51 @@
         const video = document.getElementById('background-video');
         const audio = document.getElementById('bg-music');
         const volSlider = document.getElementById('volume-slider');
+        const viewport = document.getElementById('main-viewport');
 
-        // Handle Music Load first for speed
+        // Zoom Logic
+        let currentZoom = 1;
+        document.getElementById('zoom-in').onclick = () => { currentZoom += 0.1; viewport.style.transform = `scale(${currentZoom})`; };
+        document.getElementById('zoom-out').onclick = () => { if(currentZoom > 0.5) currentZoom -= 0.1; viewport.style.transform = `scale(${currentZoom})`; };
+
+        // Fullscreen Persistence Logic
+        const fsToggle = document.getElementById('fs-toggle');
+        fsToggle.onclick = () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+                sessionStorage.setItem('isFS', 'true');
+            } else {
+                document.exitFullscreen();
+                sessionStorage.setItem('isFS', 'false');
+            }
+        };
+
+        // Resume Fullscreen on first click if memory says so
+        window.addEventListener('click', () => {
+            if (sessionStorage.getItem('isFS') === 'true' && !document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(()=>{});
+            }
+        }, { once: true });
+
         let currentTrackIndex = parseInt(localStorage.getItem('trackIndex')) || 1;
+        
         function loadTrack(index, startTime = 0) {
             currentTrackIndex = index;
             localStorage.setItem('trackIndex', index);
             audio.src = playlist[index].file;
             document.getElementById('display-song-name').innerText = playlist[index].name;
+            
+            // Set initial time from memory
             audio.currentTime = startTime;
+
             const savedVol = localStorage.getItem('globalVolume') || 0.5;
             audio.volume = savedVol; volSlider.value = savedVol;
-            if (localStorage.getItem('isPaused') === 'true') { audio.pause(); document.getElementById('toggle-btn').innerHTML = '▶'; }
-            else { audio.play(); document.getElementById('toggle-btn').innerHTML = '❚❚'; }
+            
+            if (localStorage.getItem('isPaused') === 'true') { 
+                audio.pause(); document.getElementById('toggle-btn').innerHTML = '▶'; 
+            } else { 
+                audio.play(); document.getElementById('toggle-btn').innerHTML = '❚❚'; 
+            }
         }
 
         // Logic for entry
@@ -120,17 +173,21 @@
             setTimeout(() => { document.getElementById('name-overlay').style.opacity = "1"; document.getElementById('nav-sidebar').style.opacity = "1"; }, 50);
             document.getElementById('name-overlay').classList.add('final-border');
             document.getElementById('nav-sidebar').classList.add('final-border');
-            loadTrack(currentTrackIndex, parseFloat(localStorage.getItem('musicTime')) || 0);
+            
+            // Restore exact time when refreshing
+            const savedTime = parseFloat(localStorage.getItem('musicTime')) || 0;
+            loadTrack(currentTrackIndex, savedTime);
         }
 
-        // Standard listeners kept exactly the same
         audio.ontimeupdate = () => { if (audio.duration) { 
             document.getElementById('music-progress').value = (audio.currentTime / audio.duration) * 100;
             document.getElementById('time-current').innerText = Math.floor(audio.currentTime/60)+":"+Math.floor(audio.currentTime%60).toString().padStart(2,'0');
             document.getElementById('time-total').innerText = Math.floor(audio.duration/60)+":"+Math.floor(audio.duration%60).toString().padStart(2,'0');
-            localStorage.setItem('musicTime', audio.currentTime); 
+            localStorage.setItem('musicTime', audio.currentTime); // Constantly update memory
         }};
+
         volSlider.oninput = (e) => { audio.volume = e.target.value; localStorage.setItem('globalVolume', e.target.value); };
+
         video.addEventListener('timeupdate', () => {
             if (video.currentTime > 3 && video.currentTime < 5) video.playbackRate = 3.0; else video.playbackRate = 1.0;
             if (video.currentTime > (video.duration / 2)) {
@@ -139,11 +196,18 @@
                 document.getElementById('skip-btn').style.opacity = "0";
             }
         });
-        document.getElementById('toggle-btn').onclick = () => { if (audio.paused) { audio.play(); document.getElementById('toggle-btn').innerHTML = '❚❚'; localStorage.setItem('isPaused', 'false'); } else { audio.pause(); document.getElementById('toggle-btn').innerHTML = '▶'; localStorage.setItem('isPaused', 'true'); } };
+
+        document.getElementById('toggle-btn').onclick = () => { 
+            if (audio.paused) { 
+                audio.play(); document.getElementById('toggle-btn').innerHTML = '❚❚'; localStorage.setItem('isPaused', 'false'); 
+            } else { 
+                audio.pause(); document.getElementById('toggle-btn').innerHTML = '▶'; localStorage.setItem('isPaused', 'true'); 
+            } 
+        };
+
         document.getElementById('next-btn').onclick = () => loadTrack((currentTrackIndex + 1) % playlist.length);
         document.getElementById('prev-btn').onclick = () => loadTrack((currentTrackIndex - 1 + playlist.length) % playlist.length);
         document.getElementById('music-progress').oninput = () => audio.currentTime = (document.getElementById('music-progress').value / 100) * audio.duration;
-        document.getElementById('fs-toggle').onclick = () => { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); };
     </script>
 </body>
 </html>
