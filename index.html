@@ -20,31 +20,34 @@
         }
         #background-video { display: none; }
 
-        #fs-toggle {
+        /* Fullscreen & Back Buttons */
+        .top-left-controls {
             position: fixed; top: 10px; left: 10px; z-index: 100;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .icon-btn {
             background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
             color: white; padding: 8px; border-radius: 8px; cursor: pointer;
-            backdrop-filter: blur(10px); font-size: 14px; opacity: 0.6; transition: opacity 0.3s;
+            backdrop-filter: blur(10px); font-size: 14px; opacity: 0.6; transition: opacity 0.3s, transform 0.2s;
+            width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;
         }
+        .icon-btn:hover { opacity: 1; transform: scale(1.05); }
 
+        /* Click2Cry as the ENTER Button */
         #start-container {
-            position: relative; z-index: 25; display: flex; flex-direction: column; align-items: center;
+            position: relative; z-index: 25; cursor: pointer;
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         #start-container:hover { transform: scale(1.1); }
-
-        #bubble-btn {
-            background: rgba(255, 255, 255, 0.1); color: white; padding: 15px 40px; border-radius: 50px;
-            font-size: 14px; font-weight: 800; letter-spacing: 4px; border: 1px solid rgba(255, 255, 255, 0.3);
-            cursor: pointer; backdrop-filter: blur(10px); text-transform: uppercase;
+        
+        #click2cry-btn {
+            width: 500px; max-width: 90vw; height: auto; display: block;
+            filter: drop-shadow(0 0 20px rgba(255,255,255,0.1));
         }
 
-        #click2cry {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
-            z-index: 50; width: 500px; max-width: 90vw; opacity: 0; pointer-events: none;
-            transition: opacity 0.8s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .show-cry { opacity: 1 !important; transform: translate(-50%, -50%) scale(1) !important; }
+        /* Pop effect for the actual transition */
+        .pop-animation { animation: pop-out 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        @keyframes pop-out { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(0); opacity: 0; } }
 
         #theme-picker { position: fixed; bottom: 20px; left: 20px; display: flex; gap: 10px; z-index: 100; }
         .theme-box {
@@ -113,7 +116,11 @@
 </head>
 <body>
 
-    <button id="fs-toggle">⛶</button>
+    <div class="top-left-controls">
+        <button id="fs-toggle" class="icon-btn">⛶</button>
+        <button id="back-btn" class="icon-btn" onclick="history.back()">⇠</button>
+    </div>
+
     <button id="skip-btn">SKIP INTRO</button>
 
     <video id="intro-video" autoplay muted loop>
@@ -121,10 +128,8 @@
     </video>
 
     <div id="start-container">
-        <button id="bubble-btn">ENTER</button>
+        <img src="click2cry.png" id="click2cry-btn">
     </div>
-
-    <img src="click2cry.png" id="click2cry">
 
     <div id="theme-picker">
         <div class="theme-box" onclick="changeTheme('pinkstar.mp4')"><video muted loop><source src="pinkstar.mp4"></video></div>
@@ -187,16 +192,12 @@
         const introVideo = document.getElementById('intro-video');
         const audio = document.getElementById('bg-music');
         const startContainer = document.getElementById('start-container');
-        const click2cry = document.getElementById('click2cry');
         const nameImg = document.getElementById('name-overlay');
         const navSidebar = document.getElementById('nav-sidebar');
         const musicUI = document.getElementById('music-controls-wrapper');
         const skipBtn = document.getElementById('skip-btn');
 
-        function changeTheme(src) {
-            introVideo.src = src;
-            introVideo.play();
-        }
+        function changeTheme(src) { introVideo.src = src; introVideo.play(); }
 
         function formatTime(secs) {
             const min = Math.floor(secs / 60);
@@ -238,10 +239,9 @@
 
         startContainer.addEventListener('click', () => {
             localStorage.setItem('hasEnteredSite', 'true');
-            click2cry.classList.add('show-cry');
+            startContainer.classList.add('pop-animation');
             
             setTimeout(() => {
-                click2cry.classList.remove('show-cry');
                 startContainer.style.display = 'none';
                 introVideo.style.display = 'none';
                 document.getElementById('theme-picker').style.display = 'none';
@@ -251,7 +251,7 @@
                 setTimeout(() => { skipBtn.style.opacity = "1"; }, 10);
                 video.currentTime = 3; video.play();
                 loadTrack(currentTrackIndex);
-            }, 1800);
+            }, 600);
 
             video.addEventListener('timeupdate', () => {
                 if (video.currentTime > 3 && video.currentTime < 5) video.playbackRate = 3.0;
