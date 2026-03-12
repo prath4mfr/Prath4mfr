@@ -46,6 +46,7 @@
 
         .nav-icon { width: 180px; height: auto; cursor: pointer; }
         
+        /* The transparent cover style */
         .final-border { 
             border: 1px solid rgba(255, 255, 255, 0.2) !important; 
             background: rgba(255, 255, 255, 0.08) !important; 
@@ -163,6 +164,7 @@
         const skipBtn = document.getElementById('skip-btn');
 
         let currentTrackIndex = parseInt(localStorage.getItem('trackIndex')) || 1;
+        let borderTriggered = false; // Persistent flag for the loop
 
         function formatTime(secs) {
             const min = Math.floor(secs / 60);
@@ -188,7 +190,6 @@
             }
         }
 
-        // Entrance Logic
         if (sessionStorage.getItem('justEntered') === 'true') {
             sessionStorage.removeItem('justEntered');
             video.currentTime = 3; video.play();
@@ -208,12 +209,10 @@
                 document.getElementById('music-progress').value = (audio.currentTime / audio.duration) * 100;
                 document.getElementById('time-current').innerText = formatTime(audio.currentTime);
                 document.getElementById('time-total').innerText = formatTime(audio.duration);
-                // Real-time save of music position
                 localStorage.setItem('musicTime', audio.currentTime);
             }
         };
 
-        // Extra safety: save music time on page leave
         window.addEventListener('beforeunload', () => {
             localStorage.setItem('musicTime', audio.currentTime);
         });
@@ -232,18 +231,16 @@
                 }
                 skipBtn.style.opacity = "0"; 
                 setTimeout(() => { if(video.currentTime >= midPoint) skipBtn.style.display = "none"; }, 1000);
-            } else if (video.currentTime < 1) {
-                // If it loops back
-                nameImg.classList.remove('final-border');
-                navSidebar.classList.remove('final-border');
             }
 
+            // TRIGGER BORDER 6s BEFORE END AND KEEP IT
             if (video.duration && video.currentTime > (video.duration - 6)) {
+                borderTriggered = true; // Set flag to true
+            }
+
+            if (borderTriggered) {
                 nameImg.classList.add('final-border'); 
                 navSidebar.classList.add('final-border');
-            } else if (video.currentTime < (video.duration - 6) && video.currentTime > midPoint) {
-                nameImg.classList.remove('final-border');
-                navSidebar.classList.remove('final-border');
             }
         });
 
