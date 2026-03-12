@@ -106,7 +106,7 @@
 
     <button id="skip-btn">SKIP INTRO</button>
 
-    <video id="background-video" muted playsinline preload="auto">
+    <video id="background-video" muted playsinline preload="auto" loop>
         <source src="currents.mp4" type="video/mp4">
     </video>
 
@@ -176,8 +176,11 @@
             audio.src = playlist[index].file;
             document.getElementById('display-song-name').innerText = playlist[index].name;
             audio.currentTime = startTime;
+            
             const savedVol = localStorage.getItem('globalVolume') || 0.5;
-            audio.volume = savedVol; volSlider.value = savedVol;
+            audio.volume = savedVol; 
+            volSlider.value = savedVol;
+
             if (localStorage.getItem('isPaused') === 'true') { 
                 audio.pause(); document.getElementById('toggle-btn').innerHTML = '▶'; 
             } else { 
@@ -185,6 +188,7 @@
             }
         }
 
+        // Entrance Logic
         if (sessionStorage.getItem('justEntered') === 'true') {
             sessionStorage.removeItem('justEntered');
             video.currentTime = 3; video.play();
@@ -204,9 +208,15 @@
                 document.getElementById('music-progress').value = (audio.currentTime / audio.duration) * 100;
                 document.getElementById('time-current').innerText = formatTime(audio.currentTime);
                 document.getElementById('time-total').innerText = formatTime(audio.duration);
+                // Real-time save of music position
                 localStorage.setItem('musicTime', audio.currentTime);
             }
         };
+
+        // Extra safety: save music time on page leave
+        window.addEventListener('beforeunload', () => {
+            localStorage.setItem('musicTime', audio.currentTime);
+        });
 
         video.addEventListener('timeupdate', () => {
             if (video.currentTime > 3 && video.currentTime < 5) video.playbackRate = 3.0; 
@@ -214,23 +224,24 @@
 
             let midPoint = video.duration ? (video.duration / 2) : 10;
             
-            // Gradual transition at midpoint
             if (video.currentTime >= midPoint) {
                 if(nameImg.style.display !== 'block') {
                     nameImg.style.display = 'block'; 
                     navSidebar.style.display = 'flex';
-                    // Trigger the 2.5s fade-in
                     setTimeout(() => { nameImg.style.opacity = "1"; navSidebar.style.opacity = "1"; }, 10);
                 }
-                // Gradual fade-out of skip button
                 skipBtn.style.opacity = "0"; 
                 setTimeout(() => { if(video.currentTime >= midPoint) skipBtn.style.display = "none"; }, 1000);
+            } else if (video.currentTime < 1) {
+                // If it loops back
+                nameImg.classList.remove('final-border');
+                navSidebar.classList.remove('final-border');
             }
 
             if (video.duration && video.currentTime > (video.duration - 6)) {
                 nameImg.classList.add('final-border'); 
                 navSidebar.classList.add('final-border');
-            } else {
+            } else if (video.currentTime < (video.duration - 6) && video.currentTime > midPoint) {
                 nameImg.classList.remove('final-border');
                 navSidebar.classList.remove('final-border');
             }
@@ -243,15 +254,36 @@
 
         document.getElementById('album-art').onclick = () => document.getElementById('album-modal').style.display = 'flex';
         document.getElementById('close-album').onclick = () => document.getElementById('album-modal').style.display = 'none';
+        
         document.getElementById('toggle-btn').onclick = () => {
-            if (audio.paused) { audio.play(); document.getElementById('toggle-btn').innerHTML = '❚❚'; localStorage.setItem('isPaused', 'false'); }
-            else { audio.pause(); document.getElementById('toggle-btn').innerHTML = '▶'; localStorage.setItem('isPaused', 'true'); }
+            if (audio.paused) { 
+                audio.play(); 
+                document.getElementById('toggle-btn').innerHTML = '❚❚'; 
+                localStorage.setItem('isPaused', 'false'); 
+            } else { 
+                audio.pause(); 
+                document.getElementById('toggle-btn').innerHTML = '▶'; 
+                localStorage.setItem('isPaused', 'true'); 
+            }
         };
+
         document.getElementById('next-btn').onclick = () => loadTrack((currentTrackIndex + 1) % playlist.length);
         document.getElementById('prev-btn').onclick = () => loadTrack((currentTrackIndex - 1 + playlist.length) % playlist.length);
-        volSlider.oninput = (e) => { audio.volume = e.target.value; localStorage.setItem('globalVolume', e.target.value); };
-        document.getElementById('music-progress').oninput = () => audio.currentTime = (document.getElementById('music-progress').value / 100) * audio.duration;
-        document.getElementById('fs-toggle').onclick = () => { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); };
+        
+        volSlider.oninput = (e) => { 
+            audio.volume = e.target.value; 
+            localStorage.setItem('globalVolume', e.target.value); 
+        };
+
+        document.getElementById('music-progress').oninput = () => {
+            audio.currentTime = (document.getElementById('music-progress').value / 100) * audio.duration;
+            localStorage.setItem('musicTime', audio.currentTime);
+        };
+
+        document.getElementById('fs-toggle').onclick = () => { 
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen(); 
+            else document.exitFullscreen(); 
+        };
     </script>
 </body>
 </html>
