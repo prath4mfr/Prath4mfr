@@ -14,7 +14,6 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
-        /* Video Backgrounds */
         #background-video, #intro-video {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             object-fit: cover; z-index: 1;
@@ -28,7 +27,6 @@
             backdrop-filter: blur(10px); font-size: 14px; opacity: 0.6; transition: opacity 0.3s;
         }
 
-        /* New Intro Screen */
         #start-container {
             position: relative; z-index: 25; display: flex; flex-direction: column; align-items: center;
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -39,30 +37,23 @@
             background: rgba(255, 255, 255, 0.1); color: white; padding: 15px 40px; border-radius: 50px;
             font-size: 14px; font-weight: 800; letter-spacing: 4px; border: 1px solid rgba(255, 255, 255, 0.3);
             cursor: pointer; backdrop-filter: blur(10px); text-transform: uppercase;
-            transition: background 0.3s;
         }
-        #bubble-btn:hover { background: rgba(255, 255, 255, 0.2); }
 
-        /* Click2Cry Overlay */
         #click2cry {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.5);
-            z-index: 50; width: 400px; max-width: 80vw; opacity: 0; pointer-events: none;
-            transition: opacity 1s ease, transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+            z-index: 50; width: 500px; max-width: 90vw; opacity: 0; pointer-events: none;
+            transition: opacity 0.8s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .show-cry { opacity: 1 !important; transform: translate(-50%, -50%) scale(1) !important; }
 
-        /* Theme Picker */
-        #theme-picker {
-            position: fixed; bottom: 20px; left: 20px; display: flex; gap: 10px; z-index: 100;
-        }
+        #theme-picker { position: fixed; bottom: 20px; left: 20px; display: flex; gap: 10px; z-index: 100; }
         .theme-box {
-            width: 40px; height: 40px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3);
-            cursor: pointer; overflow: hidden; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 45px; height: 45px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.3);
+            cursor: pointer; overflow: hidden; transition: transform 0.3s;
         }
         .theme-box:hover { transform: scale(1.2); border-color: white; }
         .theme-box video { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
 
-        /* Remaining UI Elements Kept Identical */
         #name-overlay {
             position: fixed; top: 20px; right: 20px; width: 480px; max-width: 85vw;
             z-index: 15; opacity: 0; display: none; padding: 20px; border-radius: 40px; border: 1px solid transparent;
@@ -80,7 +71,7 @@
         .final-border { border: 1px solid rgba(255, 255, 255, 0.2) !important; background: rgba(255, 255, 255, 0.08) !important; backdrop-filter: blur(15px); }
 
         #skip-btn {
-            position: fixed; bottom: 25px; left: 160px; z-index: 30;
+            position: fixed; bottom: 25px; left: 25px; z-index: 30;
             background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
             color: white; padding: 8px 15px; border-radius: 30px; font-size: 10px;
             letter-spacing: 2px; cursor: pointer; backdrop-filter: blur(10px);
@@ -106,9 +97,9 @@
             padding: 15px 10px; border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.08); width: 30px;
         }
 
-        #volume-slider { appearance: slider-vertical; width: 4px; height: 80px; accent-color: #fff; opacity: 0.4; }
-        #music-progress { width: 100px; height: 2px; accent-color: #fff; margin-bottom: 8px; }
-        .song-name { font-size: 8px; font-weight: 600; margin-bottom: 10px; text-transform: uppercase; opacity: 0.6; text-align: center; width: 100px;}
+        #volume-slider { appearance: slider-vertical; -webkit-appearance: slider-vertical; width: 4px; height: 80px; accent-color: #fff; opacity: 0.4; }
+        #music-progress { width: 100px; height: 2px; accent-color: #fff; margin-bottom: 8px; cursor: pointer; }
+        .song-name { font-size: 8px; font-weight: 600; margin-bottom: 10px; text-transform: uppercase; opacity: 0.6; text-align: center; width: 100px; }
         .time-container { display: flex; justify-content: space-between; width: 100px; font-size: 7px; opacity: 0.5; }
         .phys-btn { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 50%; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; }
         .side-btn { width: 22px; height: 22px; font-size: 8px; }
@@ -126,7 +117,7 @@
     <button id="skip-btn">SKIP INTRO</button>
 
     <video id="intro-video" autoplay muted loop>
-        <source src="heart.mp4" type="video/mp4">
+        <source src="pinkstar.mp4" type="video/mp4">
     </video>
 
     <div id="start-container">
@@ -136,8 +127,9 @@
     <img src="click2cry.png" id="click2cry">
 
     <div id="theme-picker">
-        <div class="theme-box" onclick="changeTheme('heart.mp4')"><video muted loop><source src="heart.mp4"></video></div>
-        <div class="theme-box" onclick="changeTheme('star.mp4')"><video muted loop><source src="star.mp4"></video></div>
+        <div class="theme-box" onclick="changeTheme('pinkstar.mp4')"><video muted loop><source src="pinkstar.mp4"></video></div>
+        <div class="theme-box" onclick="changeTheme('cyanstar.mp4')"><video muted loop><source src="cyanstar.mp4"></video></div>
+        <div class="theme-box" onclick="changeTheme('purplestar.mp4')"><video muted loop><source src="purplestar.mp4"></video></div>
         <div class="theme-box" onclick="changeTheme('bluestar.mp4')"><video muted loop><source src="bluestar.mp4"></video></div>
     </div>
 
@@ -157,7 +149,7 @@
 
     <div id="music-controls-wrapper">
         <div id="player-container">
-            <img src="currentscover.jpg" id="album-art" style="width:45px; border-radius:6px;">
+            <img src="currentscover.jpg" id="album-art" style="width:45px; border-radius:6px; cursor:pointer;">
             <div class="time-container"><span id="time-current">0:00</span><span id="time-total">0:00</span></div>
             <input type="range" id="music-progress" min="0" max="100" value="0">
             <span id="display-song-name" class="song-name">Nangs</span>
@@ -231,10 +223,7 @@
             }
         };
 
-        // Persistence Logic
-        if (performance.navigation.type !== 1 && !sessionStorage.getItem('sessionActive')) {
-            sessionStorage.setItem('sessionActive', 'true');
-        } else {
+        if (localStorage.getItem('hasEnteredSite') === 'true') {
             startContainer.style.display = 'none';
             introVideo.style.display = 'none';
             document.getElementById('theme-picker').style.display = 'none';
@@ -248,7 +237,7 @@
         }
 
         startContainer.addEventListener('click', () => {
-            // Show Click2Cry Pop Effect
+            localStorage.setItem('hasEnteredSite', 'true');
             click2cry.classList.add('show-cry');
             
             setTimeout(() => {
@@ -262,7 +251,7 @@
                 setTimeout(() => { skipBtn.style.opacity = "1"; }, 10);
                 video.currentTime = 3; video.play();
                 loadTrack(currentTrackIndex);
-            }, 1500);
+            }, 1800);
 
             video.addEventListener('timeupdate', () => {
                 if (video.currentTime > 3 && video.currentTime < 5) video.playbackRate = 3.0;
@@ -286,6 +275,7 @@
         document.getElementById('next-btn').onclick = () => loadTrack((currentTrackIndex + 1) % playlist.length);
         document.getElementById('prev-btn').onclick = () => loadTrack((currentTrackIndex - 1 + playlist.length) % playlist.length);
         document.getElementById('volume-slider').oninput = (e) => audio.volume = e.target.value;
+        document.getElementById('music-progress').oninput = () => audio.currentTime = (document.getElementById('music-progress').value / 100) * audio.duration;
         document.getElementById('fs-toggle').onclick = () => { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); };
     </script>
 </body>
