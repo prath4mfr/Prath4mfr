@@ -8,15 +8,25 @@
     <style>
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
-            overflow: hidden; background-color: #000; /* Keeps it dark during loads */
+            overflow: hidden; background-color: #000;
             display: flex; justify-content: center; align-items: center;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         #intro-video {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            object-fit: cover; z-index: 1;
-            background-color: #000;
+            object-fit: cover; z-index: 1; background-color: #000;
+        }
+
+        .top-left-controls {
+            position: fixed; top: 10px; left: 10px; z-index: 100;
+        }
+        
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white; padding: 8px; border-radius: 8px; cursor: pointer;
+            backdrop-filter: blur(10px); font-size: 14px; opacity: 0.6; transition: opacity 0.3s;
+            width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;
         }
 
         #start-container {
@@ -29,14 +39,10 @@
         }
 
         #start-container:hover { transform: scale(1.05); background: rgba(255, 255, 255, 0.1); }
-        
         #click2cry-btn { width: 190px; max-width: 70vw; height: auto; display: block; }
 
         .pop-animation { animation: pop-out 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-        @keyframes pop-out { 
-            0% { transform: scale(1.05); opacity: 1; } 
-            100% { transform: scale(0); opacity: 0; } 
-        }
+        @keyframes pop-out { 0% { transform: scale(1.05); opacity: 1; } 100% { transform: scale(0); opacity: 0; } }
 
         #theme-picker { position: fixed; bottom: 20px; left: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 100; }
         .theme-box { width: 45px; height: 45px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.3); cursor: pointer; overflow: hidden; }
@@ -44,6 +50,11 @@
     </style>
 </head>
 <body>
+
+    <div class="top-left-controls">
+        <button id="fs-toggle" class="icon-btn">⛶</button>
+    </div>
+
     <video id="intro-video" autoplay muted loop preload="auto" playsinline></video>
 
     <div id="start-container">
@@ -59,6 +70,8 @@
 
     <script>
         const introVideo = document.getElementById('intro-video');
+        const fsToggle = document.getElementById('fs-toggle');
+
         const savedTheme = localStorage.getItem('selectedTheme') || 'pinkstar.mp4';
         introVideo.src = savedTheme;
 
@@ -68,10 +81,35 @@
             localStorage.setItem('selectedTheme', src);
         }
 
+        // Fullscreen Logic with Persistence
+        function toggleFS() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+                sessionStorage.setItem('isFS', 'true');
+            } else {
+                document.exitFullscreen();
+                sessionStorage.setItem('isFS', 'false');
+            }
+        }
+
+        fsToggle.onclick = toggleFS;
+
         document.getElementById('start-container').addEventListener('click', function() {
+            // Re-check fullscreen on click to ensure it carries over
+            if (sessionStorage.getItem('isFS') === 'true' && !document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            }
             this.classList.add('pop-animation');
             sessionStorage.setItem('justEntered', 'true');
             setTimeout(() => { window.location.href = 'home.html'; }, 550);
+        });
+
+        // Try to resume FS on load if the user already clicked it elsewhere
+        window.addEventListener('load', () => {
+            if (sessionStorage.getItem('isFS') === 'true' && !document.fullscreenElement) {
+                // Browsers usually require a click to trigger FS, 
+                // so this will sync once they click "Enter"
+            }
         });
     </script>
 </body>
