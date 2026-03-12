@@ -34,14 +34,14 @@
         #name-overlay {
             position: fixed; top: 20px; right: 20px; width: 480px; max-width: 85vw;
             z-index: 15; opacity: 0; display: none; padding: 20px; border-radius: 40px;
-            transition: opacity 2s ease, border 2.5s ease, background 2.5s ease, backdrop-filter 2.5s ease;
+            transition: opacity 2.5s ease, border 2.5s ease, background 2.5s ease, backdrop-filter 2.5s ease;
         }
 
         #nav-sidebar {
             position: fixed; left: 30px; top: 50%; transform: translateY(-50%);
             display: none; flex-direction: column; align-items: center; gap: 50px; 
             z-index: 15; opacity: 0; padding: 60px 40px; border-radius: 60px;
-            transition: opacity 2s ease, border 2.5s ease, background 2.5s ease, backdrop-filter 2.5s ease;
+            transition: opacity 2.5s ease, border 2.5s ease, background 2.5s ease, backdrop-filter 2.5s ease;
         }
 
         .nav-icon { width: 180px; height: auto; cursor: pointer; }
@@ -58,7 +58,7 @@
             background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
             color: white; padding: 8px 15px; border-radius: 30px; font-size: 10px;
             cursor: pointer; backdrop-filter: blur(10px);
-            opacity: 0; display: none; transition: opacity 1.5s ease;
+            opacity: 0; display: none; transition: opacity 1s ease;
         }
 
         #music-controls-wrapper {
@@ -185,7 +185,6 @@
             }
         }
 
-        // Entrance Logic
         if (sessionStorage.getItem('justEntered') === 'true') {
             sessionStorage.removeItem('justEntered');
             video.currentTime = 3; video.play();
@@ -193,7 +192,6 @@
             setTimeout(() => { skipBtn.style.opacity = "1"; musicUI.classList.add('show-ui'); }, 50);
             loadTrack(currentTrackIndex);
         } else {
-            // If already entered (refresh), jump to 10s or half video
             video.currentTime = 10; video.play();
             musicUI.classList.add('show-ui');
             nameImg.style.display = 'block'; navSidebar.style.display = 'flex';
@@ -214,20 +212,21 @@
             if (video.currentTime > 3 && video.currentTime < 5) video.playbackRate = 3.0; 
             else video.playbackRate = 1.0;
 
-            // Halfway logic (usually around 10s based on your setup)
             let midPoint = video.duration ? (video.duration / 2) : 10;
             
+            // Gradual transition at midpoint
             if (video.currentTime >= midPoint) {
                 if(nameImg.style.display !== 'block') {
                     nameImg.style.display = 'block'; 
                     navSidebar.style.display = 'flex';
-                    setTimeout(() => { nameImg.style.opacity = "1"; navSidebar.style.opacity = "1"; }, 50);
+                    // Trigger the 2.5s fade-in
+                    setTimeout(() => { nameImg.style.opacity = "1"; navSidebar.style.opacity = "1"; }, 10);
                 }
+                // Gradual fade-out of skip button
                 skipBtn.style.opacity = "0"; 
-                setTimeout(() => skipBtn.style.display = "none", 1500);
+                setTimeout(() => { if(video.currentTime >= midPoint) skipBtn.style.display = "none"; }, 1000);
             }
 
-            // Transparent cover 6s before end
             if (video.duration && video.currentTime > (video.duration - 6)) {
                 nameImg.classList.add('final-border'); 
                 navSidebar.classList.add('final-border');
@@ -237,7 +236,6 @@
             }
         });
 
-        // Fixed Skip Logic
         skipBtn.onclick = () => { 
             let skipPoint = video.duration ? (video.duration / 2) + 0.1 : 10.1;
             video.currentTime = skipPoint; 
