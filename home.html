@@ -5,53 +5,94 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
     <link rel="icon" type="image/png" href="ballicon.png">
+    
     <style>
-        body, html { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            overflow: hidden; background-color: #000; 
-            display: flex; justify-content: center; align-items: center; 
-            font-family: sans-serif; 
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            overflow: hidden; background-color: #000;
+            display: flex; justify-content: center; align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
-        #background-video { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
-        
-        .top-left-controls { position: fixed; top: 10px; left: 10px; z-index: 100; display: flex; flex-direction: column; gap: 8px; }
-        .icon-btn { 
-            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); 
-            color: white; padding: 8px; border-radius: 8px; cursor: pointer; 
-            backdrop-filter: blur(10px); width: 35px; height: 35px; opacity: 0.6; 
-            display: flex; align-items: center; justify-content: center; font-size: 14px;
+        #background-video {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover; z-index: 1;
         }
 
-        #name-overlay { position: fixed; top: 20px; right: 20px; width: 480px; max-width: 85vw; z-index: 15; opacity: 0; display: none; padding: 20px; border-radius: 40px; transition: opacity 2s, border 2.5s; }
-        #nav-sidebar { position: fixed; left: 30px; top: 50%; transform: translateY(-50%); display: none; flex-direction: column; align-items: center; gap: 50px; z-index: 15; opacity: 0; padding: 60px 40px; border-radius: 60px; transition: opacity 2s, border 2.5s; }
+        .top-left-controls {
+            position: fixed; top: 10px; left: 10px; z-index: 100;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white; padding: 8px; border-radius: 8px; cursor: pointer;
+            backdrop-filter: blur(10px); font-size: 14px; opacity: 0.6; transition: opacity 0.3s;
+            width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;
+        }
+
+        #name-overlay {
+            position: fixed; top: 20px; right: 20px; width: 480px; max-width: 85vw;
+            z-index: 15; opacity: 0; display: none; padding: 20px; border-radius: 40px;
+            transition: opacity 2s ease, border 2.5s ease, background 2.5s ease;
+        }
+
+        #nav-sidebar {
+            position: fixed; left: 30px; top: 50%; transform: translateY(-50%);
+            display: none; flex-direction: column; align-items: center; gap: 50px; 
+            z-index: 15; opacity: 0; padding: 60px 40px; border-radius: 60px;
+            transition: opacity 2s ease, border 2.5s ease, background 2.5s ease;
+        }
+
         .nav-icon { width: 180px; height: auto; cursor: pointer; }
         .final-border { border: 1px solid rgba(255, 255, 255, 0.2) !important; background: rgba(255, 255, 255, 0.08) !important; backdrop-filter: blur(15px); }
 
-        #skip-btn { position: fixed; bottom: 25px; left: 25px; z-index: 30; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: white; padding: 8px 15px; border-radius: 30px; font-size: 10px; cursor: pointer; opacity: 0; display: none; transition: opacity 1.5s; }
-        #music-controls-wrapper { position: fixed; bottom: 20px; right: 20px; display: none; align-items: stretch; gap: 10px; z-index: 15; opacity: 0; transition: opacity 1.5s; }
+        #skip-btn {
+            position: fixed; bottom: 25px; left: 25px; z-index: 30;
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white; padding: 8px 15px; border-radius: 30px; font-size: 10px;
+            cursor: pointer; backdrop-filter: blur(10px);
+            opacity: 0; display: none; transition: opacity 1.5s ease;
+        }
+
+        #music-controls-wrapper {
+            position: fixed; bottom: 20px; right: 20px;
+            display: none; align-items: stretch; gap: 10px; z-index: 15;
+            opacity: 0; transition: opacity 1.5s ease;
+        }
         .show-ui { opacity: 1 !important; display: flex !important; }
 
-        #player-container { display: flex; flex-direction: column; align-items: center; background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); padding: 15px; border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.08); color: white; }
-        #volume-container { display: flex; flex-direction: column; align-items: center; background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); padding: 15px 10px; border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.08); width: 30px; }
+        #player-container {
+            display: flex; flex-direction: column; align-items: center;
+            background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px);
+            padding: 15px; border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.08); color: white;
+        }
+
+        #volume-container {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px);
+            padding: 15px 10px; border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.08); width: 30px;
+        }
+
         #volume-slider { appearance: slider-vertical; -webkit-appearance: slider-vertical; width: 4px; height: 80px; accent-color: #fff; opacity: 0.4; }
         #music-progress { width: 100px; height: 2px; accent-color: #fff; margin-bottom: 8px; cursor: pointer; }
-        .song-name { font-size: 8px; font-weight: 600; margin-bottom: 10px; text-transform: uppercase; opacity: 0.6; width: 100px; text-align: center; }
+        .song-name { font-size: 8px; font-weight: 600; margin-bottom: 10px; text-transform: uppercase; opacity: 0.6; text-align: center; width: 100px; }
         .time-container { display: flex; justify-content: space-between; width: 100px; font-size: 7px; opacity: 0.5; margin-bottom: 2px; }
         .phys-btn { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 50%; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; }
         .side-btn { width: 22px; height: 22px; font-size: 8px; }
         .main-btn { width: 32px; height: 32px; font-size: 11px; }
 
-        #album-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 200; display: none; justify-content: center; align-items: center; backdrop-filter: blur(15px); }
+        /* Album Zoom Modal */
+        #album-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 200; display: none;
+            justify-content: center; align-items: center; backdrop-filter: blur(15px);
+        }
         #album-modal img { width: 80%; max-width: 500px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
         #close-album { position: absolute; top: 30px; right: 30px; font-size: 30px; color: white; cursor: pointer; opacity: 0.7; }
     </style>
 </head>
 <body>
-
-    <video id="background-video" muted playsinline preload="auto">
-        <source src="currents.mp4" type="video/mp4">
-    </video>
 
     <div class="top-left-controls">
         <button id="fs-toggle" class="icon-btn">⛶</button>
@@ -59,6 +100,11 @@
     </div>
 
     <button id="skip-btn">SKIP INTRO</button>
+
+    <video id="background-video" muted playsinline preload="auto">
+        <source src="currents.mp4" type="video/mp4">
+    </video>
+
     <img src="currentsname.png" id="name-overlay">
 
     <div id="nav-sidebar">
@@ -106,23 +152,19 @@
         const video = document.getElementById('background-video');
         const audio = document.getElementById('bg-music');
         const volSlider = document.getElementById('volume-slider');
+        const nameImg = document.getElementById('name-overlay');
+        const navSidebar = document.getElementById('nav-sidebar');
+        const musicUI = document.getElementById('music-controls-wrapper');
         const skipBtn = document.getElementById('skip-btn');
 
-        // Fullscreen Toggle
-        document.getElementById('fs-toggle').onclick = () => {
-            if (!document.fullscreenElement) document.documentElement.requestFullscreen();
-            else document.exitFullscreen();
-        };
-
-        // Album Zoom
-        document.getElementById('album-art').onclick = () => document.getElementById('album-modal').style.display = 'flex';
-        document.getElementById('close-album').onclick = () => document.getElementById('album-modal').style.display = 'none';
-
-        // Skip Button Logic
-        skipBtn.onclick = () => { video.currentTime = 10; };
-
         let currentTrackIndex = parseInt(localStorage.getItem('trackIndex')) || 1;
-        
+
+        function formatTime(secs) {
+            const min = Math.floor(secs / 60);
+            const sec = Math.floor(secs % 60);
+            return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+        }
+
         function loadTrack(index, startTime = 0) {
             currentTrackIndex = index;
             localStorage.setItem('trackIndex', index);
@@ -138,53 +180,55 @@
             }
         }
 
+        // Logic for Entry and Session Memory
         if (sessionStorage.getItem('justEntered') === 'true') {
             sessionStorage.removeItem('justEntered');
             video.currentTime = 3; video.play();
             skipBtn.style.display = 'block';
-            setTimeout(() => { skipBtn.style.opacity = "1"; document.getElementById('music-controls-wrapper').classList.add('show-ui'); }, 50);
+            setTimeout(() => { skipBtn.style.opacity = "1"; musicUI.classList.add('show-ui'); }, 50);
             loadTrack(currentTrackIndex);
         } else {
             video.currentTime = 10; video.play();
-            document.getElementById('music-controls-wrapper').classList.add('show-ui');
-            document.getElementById('name-overlay').style.display = 'block';
-            document.getElementById('nav-sidebar').style.display = 'flex';
-            setTimeout(() => { document.getElementById('name-overlay').style.opacity = "1"; document.getElementById('nav-sidebar').style.opacity = "1"; }, 50);
-            document.getElementById('name-overlay').classList.add('final-border');
-            document.getElementById('nav-sidebar').classList.add('final-border');
+            musicUI.classList.add('show-ui');
+            nameImg.style.display = 'block'; navSidebar.style.display = 'flex';
+            setTimeout(() => { nameImg.style.opacity = "1"; navSidebar.style.opacity = "1"; }, 50);
+            nameImg.classList.add('final-border'); navSidebar.classList.add('final-border');
             loadTrack(currentTrackIndex, parseFloat(localStorage.getItem('musicTime')) || 0);
         }
 
-        audio.ontimeupdate = () => { if (audio.duration) { 
-            document.getElementById('music-progress').value = (audio.currentTime / audio.duration) * 100;
-            document.getElementById('time-current').innerText = Math.floor(audio.currentTime/60)+":"+Math.floor(audio.currentTime%60).toString().padStart(2,'0');
-            document.getElementById('time-total').innerText = Math.floor(audio.duration/60)+":"+Math.floor(audio.duration%60).toString().padStart(2,'0');
-            localStorage.setItem('musicTime', audio.currentTime);
-        }};
-
-        volSlider.oninput = (e) => { audio.volume = e.target.value; localStorage.setItem('globalVolume', e.target.value); };
+        audio.ontimeupdate = () => {
+            if (audio.duration) {
+                document.getElementById('music-progress').value = (audio.currentTime / audio.duration) * 100;
+                document.getElementById('time-current').innerText = formatTime(audio.currentTime);
+                document.getElementById('time-total').innerText = formatTime(audio.duration);
+                localStorage.setItem('musicTime', audio.currentTime);
+            }
+        };
 
         video.addEventListener('timeupdate', () => {
             if (video.currentTime > 3 && video.currentTime < 5) video.playbackRate = 3.0; else video.playbackRate = 1.0;
             if (video.currentTime >= 10) {
-                document.getElementById('name-overlay').style.display = 'block'; document.getElementById('nav-sidebar').style.display = 'flex';
-                setTimeout(() => { document.getElementById('name-overlay').style.opacity = "1"; document.getElementById('nav-sidebar').style.opacity = "1"; }, 50);
+                nameImg.style.display = 'block'; navSidebar.style.display = 'flex';
+                setTimeout(() => { nameImg.style.opacity = "1"; navSidebar.style.opacity = "1"; }, 50);
                 skipBtn.style.opacity = "0"; setTimeout(() => skipBtn.style.display = "none", 1500);
             }
             if (video.currentTime > (video.duration - 6)) {
-                document.getElementById('name-overlay').classList.add('final-border');
-                document.getElementById('nav-sidebar').classList.add('final-border');
+                nameImg.classList.add('final-border'); navSidebar.classList.add('final-border');
             }
         });
 
-        document.getElementById('toggle-btn').onclick = () => { 
+        skipBtn.onclick = () => { video.currentTime = 10; };
+        document.getElementById('album-art').onclick = () => document.getElementById('album-modal').style.display = 'flex';
+        document.getElementById('close-album').onclick = () => document.getElementById('album-modal').style.display = 'none';
+        document.getElementById('toggle-btn').onclick = () => {
             if (audio.paused) { audio.play(); document.getElementById('toggle-btn').innerHTML = '❚❚'; localStorage.setItem('isPaused', 'false'); }
-            else { audio.pause(); document.getElementById('toggle-btn').innerHTML = '▶'; localStorage.setItem('isPaused', 'true'); } 
+            else { audio.pause(); document.getElementById('toggle-btn').innerHTML = '▶'; localStorage.setItem('isPaused', 'true'); }
         };
-
         document.getElementById('next-btn').onclick = () => loadTrack((currentTrackIndex + 1) % playlist.length);
         document.getElementById('prev-btn').onclick = () => loadTrack((currentTrackIndex - 1 + playlist.length) % playlist.length);
+        volSlider.oninput = (e) => { audio.volume = e.target.value; localStorage.setItem('globalVolume', e.target.value); };
         document.getElementById('music-progress').oninput = () => audio.currentTime = (document.getElementById('music-progress').value / 100) * audio.duration;
+        document.getElementById('fs-toggle').onclick = () => { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); };
     </script>
 </body>
 </html>
