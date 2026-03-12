@@ -24,12 +24,12 @@
         }
         #start-container:hover { transform: scale(1.1); }
         
+        /* Reduced size of click2cry */
         #click2cry-btn {
-            width: 500px; max-width: 90vw; height: auto; display: block;
+            width: 320px; max-width: 80vw; height: auto; display: block;
             filter: drop-shadow(0 0 20px rgba(255,255,255,0.1));
         }
 
-        /* Pop effect on click */
         .pop-animation { animation: pop-out 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
         @keyframes pop-out { 
             0% { transform: scale(1); opacity: 1; } 
@@ -37,7 +37,11 @@
             100% { transform: scale(0); opacity: 0; } 
         }
 
-        #theme-picker { position: fixed; bottom: 20px; left: 20px; display: flex; gap: 10px; z-index: 100; }
+        /* Themes stacked vertically */
+        #theme-picker { 
+            position: fixed; bottom: 20px; left: 20px; 
+            display: flex; flex-direction: column; gap: 10px; z-index: 100; 
+        }
         .theme-box {
             width: 45px; height: 45px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.3);
             cursor: pointer; overflow: hidden; transition: transform 0.3s;
@@ -72,7 +76,6 @@
 
         document.getElementById('start-container').addEventListener('click', function() {
             this.classList.add('pop-animation');
-            // Store that we just clicked enter so the main page knows to play the intro
             sessionStorage.setItem('justEntered', 'true');
             setTimeout(() => {
                 window.location.href = 'home.html';
