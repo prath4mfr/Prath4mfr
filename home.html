@@ -46,7 +46,6 @@
 
         .nav-icon { width: 180px; height: auto; cursor: pointer; }
         
-        /* This is the transparent cover that comes 6s before the end */
         .final-border { 
             border: 1px solid rgba(255, 255, 255, 0.2) !important; 
             background: rgba(255, 255, 255, 0.08) !important; 
@@ -186,7 +185,7 @@
             }
         }
 
-        // Handle Refresh vs First Entrance
+        // Entrance Logic
         if (sessionStorage.getItem('justEntered') === 'true') {
             sessionStorage.removeItem('justEntered');
             video.currentTime = 3; video.play();
@@ -194,6 +193,7 @@
             setTimeout(() => { skipBtn.style.opacity = "1"; musicUI.classList.add('show-ui'); }, 50);
             loadTrack(currentTrackIndex);
         } else {
+            // If already entered (refresh), jump to 10s or half video
             video.currentTime = 10; video.play();
             musicUI.classList.add('show-ui');
             nameImg.style.display = 'block'; navSidebar.style.display = 'flex';
@@ -211,12 +211,13 @@
         };
 
         video.addEventListener('timeupdate', () => {
-            // Intro Speed Logic
             if (video.currentTime > 3 && video.currentTime < 5) video.playbackRate = 3.0; 
             else video.playbackRate = 1.0;
 
-            // Show UI elements exactly halfway through the video duration (or at 10s)
-            if (video.currentTime >= 10) {
+            // Halfway logic (usually around 10s based on your setup)
+            let midPoint = video.duration ? (video.duration / 2) : 10;
+            
+            if (video.currentTime >= midPoint) {
                 if(nameImg.style.display !== 'block') {
                     nameImg.style.display = 'block'; 
                     navSidebar.style.display = 'flex';
@@ -226,18 +227,22 @@
                 setTimeout(() => skipBtn.style.display = "none", 1500);
             }
 
-            // ADD THE TRANSPARENT COVER 6 SECONDS BEFORE END
-            if (video.currentTime > (video.duration - 6)) {
+            // Transparent cover 6s before end
+            if (video.duration && video.currentTime > (video.duration - 6)) {
                 nameImg.classList.add('final-border'); 
                 navSidebar.classList.add('final-border');
-            } else if (video.currentTime < (video.duration - 6) && video.currentTime > 10) {
-                // Ensure it's off if they skip back or loop
+            } else {
                 nameImg.classList.remove('final-border');
                 navSidebar.classList.remove('final-border');
             }
         });
 
-        skipBtn.onclick = () => { video.currentTime = 10; };
+        // Fixed Skip Logic
+        skipBtn.onclick = () => { 
+            let skipPoint = video.duration ? (video.duration / 2) + 0.1 : 10.1;
+            video.currentTime = skipPoint; 
+        };
+
         document.getElementById('album-art').onclick = () => document.getElementById('album-modal').style.display = 'flex';
         document.getElementById('close-album').onclick = () => document.getElementById('album-modal').style.display = 'none';
         document.getElementById('toggle-btn').onclick = () => {
