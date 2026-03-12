@@ -20,7 +20,6 @@
         }
         #background-video { display: none; }
 
-        /* Fullscreen & Back Buttons */
         .top-left-controls {
             position: fixed; top: 10px; left: 10px; z-index: 100;
             display: flex; flex-direction: column; gap: 8px;
@@ -33,7 +32,6 @@
         }
         .icon-btn:hover { opacity: 1; transform: scale(1.05); }
 
-        /* Click2Cry as the ENTER Button */
         #start-container {
             position: relative; z-index: 25; cursor: pointer;
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -45,7 +43,6 @@
             filter: drop-shadow(0 0 20px rgba(255,255,255,0.1));
         }
 
-        /* Pop effect for the actual transition */
         .pop-animation { animation: pop-out 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
         @keyframes pop-out { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(0); opacity: 0; } }
 
@@ -118,7 +115,7 @@
 
     <div class="top-left-controls">
         <button id="fs-toggle" class="icon-btn">⛶</button>
-        <button id="back-btn" class="icon-btn" onclick="history.back()">⇠</button>
+        <button id="back-btn" class="icon-btn">⇠</button>
     </div>
 
     <button id="skip-btn">SKIP INTRO</button>
@@ -196,6 +193,7 @@
         const navSidebar = document.getElementById('nav-sidebar');
         const musicUI = document.getElementById('music-controls-wrapper');
         const skipBtn = document.getElementById('skip-btn');
+        const backBtn = document.getElementById('back-btn');
 
         function changeTheme(src) { introVideo.src = src; introVideo.play(); }
 
@@ -224,47 +222,77 @@
             }
         };
 
-        if (localStorage.getItem('hasEnteredSite') === 'true') {
+        // REFRESH LOGIC: On a fresh window open/refresh, always show "Enter"
+        // Session storage clears when tab is closed, making it perfect for "new open"
+        if (performance.navigation.type === 1 || !sessionStorage.getItem('enteredThisSession')) {
+            showEnterScreen();
+        } else {
+            enterMainSite(true);
+        }
+
+        function showEnterScreen() {
+            startContainer.style.display = 'flex';
+            startContainer.classList.remove('pop-animation');
+            introVideo.style.display = 'block';
+            document.getElementById('theme-picker').style.display = 'flex';
+            video.style.display = 'none';
+            musicUI.classList.remove('show-ui');
+            nameImg.style.display = 'none';
+            navSidebar.style.display = 'none';
+            nameImg.style.opacity = "0";
+            navSidebar.style.opacity = "0";
+            nameImg.classList.remove('final-border');
+            navSidebar.classList.remove('final-border');
+        }
+
+        function enterMainSite(immediate = false) {
+            sessionStorage.setItem('enteredThisSession', 'true');
             startContainer.style.display = 'none';
             introVideo.style.display = 'none';
             document.getElementById('theme-picker').style.display = 'none';
             video.style.display = 'block';
-            video.currentTime = 10; video.play();
             musicUI.classList.add('show-ui');
-            nameImg.style.display = 'block'; navSidebar.style.display = 'flex';
-            setTimeout(() => { nameImg.style.opacity = "1"; navSidebar.style.opacity = "1"; }, 10);
-            nameImg.classList.add('final-border'); navSidebar.classList.add('final-border');
-            loadTrack(currentTrackIndex, parseFloat(localStorage.getItem('musicTime')) || 0);
+
+            if (immediate) {
+                video.currentTime = 10;
+                video.play();
+                nameImg.style.display = 'block';
+                navSidebar.style.display = 'flex';
+                nameImg.style.opacity = "1";
+                navSidebar.style.opacity = "1";
+                nameImg.classList.add('final-border');
+                navSidebar.classList.add('final-border');
+                loadTrack(currentTrackIndex, parseFloat(localStorage.getItem('musicTime')) || 0);
+            } else {
+                video.currentTime = 3;
+                video.play();
+                skipBtn.style.display = 'block';
+                setTimeout(() => { skipBtn.style.opacity = "1"; }, 10);
+                loadTrack(currentTrackIndex);
+            }
         }
 
         startContainer.addEventListener('click', () => {
-            localStorage.setItem('hasEnteredSite', 'true');
             startContainer.classList.add('pop-animation');
-            
-            setTimeout(() => {
-                startContainer.style.display = 'none';
-                introVideo.style.display = 'none';
-                document.getElementById('theme-picker').style.display = 'none';
-                video.style.display = 'block';
-                musicUI.classList.add('show-ui');
-                skipBtn.style.display = 'block';
-                setTimeout(() => { skipBtn.style.opacity = "1"; }, 10);
-                video.currentTime = 3; video.play();
-                loadTrack(currentTrackIndex);
-            }, 600);
+            setTimeout(() => enterMainSite(false), 600);
+        });
 
-            video.addEventListener('timeupdate', () => {
-                if (video.currentTime > 3 && video.currentTime < 5) video.playbackRate = 3.0;
-                else video.playbackRate = 1.0;
-                if (video.currentTime > (video.duration / 2)) {
-                    nameImg.style.display = 'block'; navSidebar.style.display = 'flex';
-                    setTimeout(() => { nameImg.style.opacity = "1"; navSidebar.style.opacity = "1"; }, 50);
-                    skipBtn.style.opacity = "0"; setTimeout(() => skipBtn.style.display = "none", 1500);
-                }
-                if (video.currentTime > (video.duration - 6)) {
-                    nameImg.classList.add('final-border'); navSidebar.classList.add('final-border');
-                }
-            });
+        backBtn.onclick = () => {
+            sessionStorage.removeItem('enteredThisSession');
+            location.reload(); // Restarts the progress as requested
+        };
+
+        video.addEventListener('timeupdate', () => {
+            if (video.currentTime > 3 && video.currentTime < 5) video.playbackRate = 3.0;
+            else video.playbackRate = 1.0;
+            if (video.currentTime > (video.duration / 2)) {
+                nameImg.style.display = 'block'; navSidebar.style.display = 'flex';
+                setTimeout(() => { nameImg.style.opacity = "1"; navSidebar.style.opacity = "1"; }, 50);
+                skipBtn.style.opacity = "0"; setTimeout(() => skipBtn.style.display = "none", 1500);
+            }
+            if (video.currentTime > (video.duration - 6)) {
+                nameImg.classList.add('final-border'); navSidebar.classList.add('final-border');
+            }
         });
 
         skipBtn.onclick = () => { video.currentTime = (video.duration / 2) + 0.1; };
