@@ -26,15 +26,20 @@
             backdrop-filter: blur(10px); font-size: 14px; opacity: 0.6; transition: opacity 0.3s;
         }
 
+        /* Restored Hover Pop Effect */
         #start-container {
             display: flex; flex-direction: column; align-items: center; gap: 12px;
             z-index: 25; cursor: pointer; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+        #start-container:hover { transform: scale(1.1); }
+        
         #start-gif { width: 280px; max-width: 80vw; height: auto; }
+        
         #bubble-btn {
             background: #ff85a2; color: white; padding: 5px 15px; border-radius: 30px;
             font-size: 11px; font-weight: 800; letter-spacing: 1px;
             animation: float-btn 3s ease-in-out infinite; text-transform: uppercase; border: none;
+            cursor: pointer;
         }
 
         @keyframes float-btn { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
@@ -65,7 +70,15 @@
             backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
         }
 
-        /* Container for both Player and Volume Box */
+        /* Restored Skip Button Style */
+        #skip-btn {
+            position: fixed; bottom: 25px; left: 25px; z-index: 30;
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white; padding: 8px 15px; border-radius: 30px; font-size: 10px;
+            letter-spacing: 2px; cursor: pointer; backdrop-filter: blur(10px);
+            opacity: 0; display: none; transition: opacity 1.5s ease;
+        }
+
         #music-controls-wrapper {
             position: fixed; bottom: 20px; right: 20px;
             display: none; align-items: stretch; gap: 10px; z-index: 15;
@@ -73,14 +86,12 @@
         }
         .show-ui { opacity: 1 !important; display: flex !important; }
 
-        /* Main Player Box */
         #player-container {
             display: flex; flex-direction: column; align-items: center;
             background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             padding: 15px; border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.08); color: white;
         }
 
-        /* Volume Side Box */
         #volume-container {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -89,12 +100,10 @@
         }
 
         #album-art { width: 45px; height: 45px; border-radius: 6px; margin-bottom: 10px; cursor: pointer; }
-
         .time-container { display: flex; justify-content: space-between; width: 100px; font-size: 7px; opacity: 0.5; margin-bottom: 2px; }
         #music-progress { width: 100px; height: 2px; accent-color: #fff; margin-bottom: 8px; cursor: pointer; }
         .song-name { font-size: 8px; font-weight: 600; margin-bottom: 10px; text-transform: uppercase; opacity: 0.6; width: 100px; text-align: center; }
 
-        /* Vertical Volume Slider */
         #volume-slider { 
             appearance: slider-vertical; -webkit-appearance: slider-vertical;
             width: 4px; height: 80px; accent-color: #fff; opacity: 0.4; cursor: pointer;
@@ -123,6 +132,7 @@
 <body>
 
     <button id="fs-toggle">⛶</button>
+    <button id="skip-btn">SKIP INTRO</button>
 
     <div id="start-container">
         <img src="start.gif" id="start-gif">
@@ -197,6 +207,7 @@
         const musicUI = document.getElementById('music-controls-wrapper');
         const toggleBtn = document.getElementById('toggle-btn');
         const musicProgress = document.getElementById('music-progress');
+        const skipBtn = document.getElementById('skip-btn');
 
         function formatTime(secs) {
             const min = Math.floor(secs / 60);
@@ -243,7 +254,6 @@
             bubble.addEventListener('animationend', () => bubble.remove());
         }
 
-        // Fresh page load vs. returning from subpage
         if (performance.navigation.type !== 1 && !sessionStorage.getItem('sessionActive')) {
             bubbleInterval = setInterval(createBubble, 300);
             sessionStorage.setItem('sessionActive', 'true');
@@ -270,6 +280,8 @@
             startContainer.style.display = 'none';
             video.style.display = 'block';
             musicUI.classList.add('show-ui');
+            skipBtn.style.display = 'block';
+            setTimeout(() => { skipBtn.style.opacity = "1"; }, 10);
             video.currentTime = 3;
             video.play();
             loadTrack(currentTrackIndex);
@@ -277,10 +289,13 @@
             video.addEventListener('timeupdate', () => {
                 if (video.currentTime > 3 && video.currentTime < 5) video.playbackRate = 3.0;
                 else video.playbackRate = 1.0;
+                
                 if (video.currentTime > (video.duration / 2)) {
                     nameImg.style.display = 'block';
                     navSidebar.style.display = 'flex';
                     setTimeout(() => { nameImg.style.opacity = "1"; navSidebar.style.opacity = "1"; }, 50);
+                    skipBtn.style.opacity = "0";
+                    setTimeout(() => { skipBtn.style.display = "none"; }, 1500);
                 }
                 if (video.currentTime > (video.duration - 6)) {
                     nameImg.classList.add('final-border');
@@ -288,6 +303,8 @@
                 }
             });
         });
+
+        skipBtn.onclick = () => { video.currentTime = (video.duration / 2) + 0.1; };
 
         toggleBtn.addEventListener('click', () => {
             if (audio.paused) { 
