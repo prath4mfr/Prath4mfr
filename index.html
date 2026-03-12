@@ -8,7 +8,7 @@
     <style>
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
-            overflow: hidden; background-color: #000;
+            overflow: hidden; background-color: #000; /* Keeps it dark during loads */
             display: flex; justify-content: center; align-items: center;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
@@ -16,59 +16,35 @@
         #intro-video {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             object-fit: cover; z-index: 1;
+            background-color: #000;
         }
 
-        /* Glass Container for Click2Cry */
         #start-container {
-            position: relative; 
-            z-index: 25; 
-            cursor: pointer;
-            padding: 15px 35px;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 25px;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+            position: relative; z-index: 25; cursor: pointer;
+            padding: 15px 35px; background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 25px;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
 
-        #start-container:hover { 
-            transform: scale(1.05); 
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-        }
+        #start-container:hover { transform: scale(1.05); background: rgba(255, 255, 255, 0.1); }
         
-        #click2cry-btn {
-            width: 190px; /* Made it a little shorter as requested */
-            max-width: 70vw; 
-            height: auto; 
-            display: block;
-            filter: drop-shadow(0 0 10px rgba(255,255,255,0.1));
-        }
+        #click2cry-btn { width: 190px; max-width: 70vw; height: auto; display: block; }
 
         .pop-animation { animation: pop-out 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
         @keyframes pop-out { 
             0% { transform: scale(1.05); opacity: 1; } 
-            50% { transform: scale(1.2); opacity: 1; } 
             100% { transform: scale(0); opacity: 0; } 
         }
 
-        #theme-picker { 
-            position: fixed; bottom: 20px; left: 20px; 
-            display: flex; flex-direction: column; gap: 10px; z-index: 100; 
-        }
-        .theme-box {
-            width: 45px; height: 45px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.3);
-            cursor: pointer; overflow: hidden; transition: transform 0.3s;
-        }
-        .theme-box:hover { transform: scale(1.2); border-color: white; }
-        .theme-box video { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+        #theme-picker { position: fixed; bottom: 20px; left: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 100; }
+        .theme-box { width: 45px; height: 45px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.3); cursor: pointer; overflow: hidden; }
+        .theme-box video { width: 100%; height: 100%; object-fit: cover; }
     </style>
 </head>
 <body>
-
-    <video id="intro-video" autoplay muted loop></video>
+    <video id="intro-video" autoplay muted loop preload="auto" playsinline></video>
 
     <div id="start-container">
         <img src="click2cry.png" id="click2cry-btn">
@@ -83,23 +59,19 @@
 
     <script>
         const introVideo = document.getElementById('intro-video');
-
-        // Load saved theme or default to pinkstar
         const savedTheme = localStorage.getItem('selectedTheme') || 'pinkstar.mp4';
         introVideo.src = savedTheme;
 
         function changeTheme(src) {
             introVideo.src = src;
             introVideo.play();
-            localStorage.setItem('selectedTheme', src); // Save the choice
+            localStorage.setItem('selectedTheme', src);
         }
 
         document.getElementById('start-container').addEventListener('click', function() {
             this.classList.add('pop-animation');
             sessionStorage.setItem('justEntered', 'true');
-            setTimeout(() => {
-                window.location.href = 'home.html';
-            }, 600);
+            setTimeout(() => { window.location.href = 'home.html'; }, 550);
         });
     </script>
 </body>
