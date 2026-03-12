@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
-    <link rel="icon" type="image/jpeg" href="ballicon.png">
+    <link rel="icon" type="image/jpeg" href="ballicon.jpg">
     
     <style>
         body, html {
@@ -51,7 +51,7 @@
             100% { transform: translateY(-120vh) translateX(var(--drift)) rotate(360deg); opacity: 0; }
         }
 
-        /* Nav & Name - Hidden initially by display:none to disable links */
+        /* Nav & Name */
         #name-overlay {
             position: fixed; top: 20px; right: 20px; width: 480px; max-width: 85vw;
             z-index: 15; opacity: 0; display: none; padding: 20px; border-radius: 40px; border: 1px solid transparent;
@@ -72,7 +72,7 @@
             backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); box-shadow: 0 10px 40px rgba(0,0,0,0.4);
         }
 
-        /* Player */
+        /* Player - Original Code Updated with Progress Bar */
         #player-container {
             position: fixed; bottom: 20px; right: 20px; display: none; flex-direction: column; align-items: center;
             background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -81,6 +81,10 @@
         }
         .show-ui { opacity: 1 !important; display: flex !important; }
         #album-art { width: 45px; height: 45px; border-radius: 6px; margin-bottom: 6px; cursor: pointer; transition: transform 0.3s ease; }
+        
+        /* New Music Progress Slider Style */
+        #music-progress { width: 60px; height: 2px; accent-color: #fff; margin-bottom: 8px; opacity: 0.6; cursor: pointer; }
+        
         .song-name { font-size: 8px; font-weight: 600; margin-bottom: 10px; text-transform: uppercase; opacity: 0.6; width: 100px; text-align: center; }
         #volume-slider { width: 60px; height: 2px; accent-color: #fff; margin-bottom: 12px; opacity: 0.4; }
         .control-row { display: flex; align-items: center; gap: 8px; }
@@ -88,16 +92,13 @@
         .side-btn { width: 22px; height: 22px; font-size: 8px; }
         .main-btn { width: 32px; height: 32px; font-size: 11px; }
 
-        /* Restored and Improved Art Viewer */
+        /* Art Viewer */
         #art-viewer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.95); backdrop-filter: blur(15px);
             z-index: 1000; display: none; flex-direction: column; justify-content: center; align-items: center;
         }
-        #art-viewer img { 
-            max-width: 80%; max-height: 80%; border-radius: 12px; 
-            transition: transform 0.3s ease; cursor: zoom-in;
-        }
+        #art-viewer img { max-width: 80%; max-height: 80%; border-radius: 12px; transition: transform 0.3s ease; cursor: zoom-in; }
         .zoom-in { transform: scale(1.5); cursor: zoom-out !important; }
         #close-art { position: absolute; top: 30px; right: 30px; color: white; font-size: 30px; cursor: pointer; opacity: 0.5; }
         #close-art:hover { opacity: 1; }
@@ -132,7 +133,6 @@
     <div id="art-viewer">
         <span id="close-art">&times;</span>
         <img src="currentscover.jpg" id="full-art">
-        <p style="color: white; font-size: 10px; margin-top: 20px; opacity: 0.5;">CLICK IMAGE TO ZOOM</p>
     </div>
 
     <div id="nav-sidebar">
@@ -149,6 +149,7 @@
 
     <div id="player-container">
         <img src="currentscover.jpg" id="album-art">
+        <input type="range" id="music-progress" min="0" max="100" value="0">
         <span id="display-song-name" class="song-name">Nangs</span>
         <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.5">
         <div class="control-row">
@@ -187,25 +188,18 @@
         const navSidebar = document.getElementById('nav-sidebar');
         const player = document.getElementById('player-container');
         const toggleBtn = document.getElementById('toggle-btn');
+        const musicProgress = document.getElementById('music-progress');
 
-        // Fullscreen Logic
+        // Fullscreen & Art Viewer Logic
         document.getElementById('fs-toggle').onclick = () => {
             if (!document.fullscreenElement) document.documentElement.requestFullscreen();
             else document.exitFullscreen();
         };
-
-        // Album Art Viewer Logic
         const artViewer = document.getElementById('art-viewer');
         const fullArt = document.getElementById('full-art');
         document.getElementById('album-art').onclick = () => { artViewer.style.display = 'flex'; };
-        document.getElementById('close-art').onclick = () => { 
-            artViewer.style.display = 'none'; 
-            fullArt.classList.remove('zoom-in');
-        };
-        fullArt.onclick = (e) => {
-            e.stopPropagation();
-            fullArt.classList.toggle('zoom-in');
-        };
+        document.getElementById('close-art').onclick = () => { artViewer.style.display = 'none'; fullArt.classList.remove('zoom-in'); };
+        fullArt.onclick = (e) => { e.stopPropagation(); fullArt.classList.toggle('zoom-in'); };
 
         function loadTrack(index) {
             currentTrackIndex = index;
@@ -214,6 +208,19 @@
             audio.play();
             toggleBtn.innerHTML = '❚❚';
         }
+
+        // MUSIC PROGRESS LOGIC
+        audio.ontimeupdate = () => {
+            if (audio.duration) {
+                const pos = (audio.currentTime / audio.duration) * 100;
+                musicProgress.value = pos;
+            }
+        };
+
+        musicProgress.oninput = () => {
+            const seekTime = (musicProgress.value / 100) * audio.duration;
+            audio.currentTime = seekTime;
+        };
 
         function createBubble() {
             const bubble = document.createElement('img');
@@ -229,14 +236,29 @@
             bubble.addEventListener('animationend', () => bubble.remove());
         }
 
-        bubbleInterval = setInterval(createBubble, 300);
-
-        video.onended = () => {
-            video.currentTime = 3;
-            video.play();
+        window.onload = () => {
+            if (sessionStorage.getItem('hasEntered')) {
+                startContainer.style.display = 'none';
+                video.style.display = 'block';
+                video.currentTime = (video.duration / 2) + 1;
+                video.play();
+                player.classList.add('show-ui');
+                nameImg.style.display = 'block';
+                navSidebar.style.display = 'flex';
+                nameImg.style.opacity = "1";
+                navSidebar.style.opacity = "1";
+                nameImg.classList.add('final-border');
+                navSidebar.classList.add('final-border');
+                loadTrack(1);
+            } else {
+                bubbleInterval = setInterval(createBubble, 300);
+            }
         };
 
+        video.onended = () => { video.currentTime = 3; video.play(); };
+
         startContainer.addEventListener('click', () => {
+            sessionStorage.setItem('hasEntered', 'true');
             clearInterval(bubbleInterval);
             document.querySelectorAll('.floating-bubble').forEach(b => b.remove());
             startContainer.style.display = 'none';
@@ -249,22 +271,16 @@
             loadTrack(1);
 
             video.addEventListener('timeupdate', () => {
-                // Turbo Boost
                 if (video.currentTime > 3 && video.currentTime < 5) video.playbackRate = 3.0;
                 else video.playbackRate = 1.0;
 
-                // PNGs and Links appear at halfway mark
                 if (video.currentTime > (video.duration / 2)) {
                     nameImg.style.display = 'block';
                     navSidebar.style.display = 'flex';
-                    setTimeout(() => {
-                        nameImg.style.opacity = "1";
-                        navSidebar.style.opacity = "1";
-                    }, 50);
+                    setTimeout(() => { nameImg.style.opacity = "1"; navSidebar.style.opacity = "1"; }, 50);
                     skipBtn.style.opacity = "0";
                     setTimeout(() => { skipBtn.style.display = "none"; }, 1500);
                 }
-                
                 if (video.currentTime > (video.duration - 6)) {
                     if (!glassLocked) {
                         nameImg.classList.add('final-border');
@@ -284,7 +300,6 @@
         document.getElementById('next-btn').onclick = () => loadTrack((currentTrackIndex + 1) % playlist.length);
         document.getElementById('prev-btn').onclick = () => loadTrack((currentTrackIndex - 1 + playlist.length) % playlist.length);
         document.getElementById('volume-slider').oninput = (e) => audio.volume = e.target.value;
-        audio.onended = () => loadTrack((currentTrackIndex + 1) % playlist.length);
     </script>
 </body>
 </html>
