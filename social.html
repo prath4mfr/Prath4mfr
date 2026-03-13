@@ -26,7 +26,6 @@
         #door-video { z-index: 2; }
         #whitespace-video { z-index: 1; opacity: 0; }
 
-        /* UI CONTROLS */
         .top-left-controls {
             position: fixed; top: 10px; left: 10px; z-index: 100;
             display: flex; flex-direction: column; gap: 8px;
@@ -62,14 +61,31 @@
         </video>
     </div>
 
+    <audio id="door-sound">
+        <source src="doorsound.mp3" type="audio/mpeg">
+    </audio>
+
     <div id="social-content">
         </div>
 
     <script>
         const doorVid = document.getElementById('door-video');
         const whiteVid = document.getElementById('whitespace-video');
+        const doorSound = document.getElementById('door-sound');
         const socialContent = document.getElementById('social-content');
         const fsToggle = document.getElementById('fs-toggle');
+
+        let soundTriggered = false;
+
+        doorVid.ontimeupdate = () => {
+            // Calculate 12 seconds before the end
+            if (doorVid.duration && (doorVid.duration - doorVid.currentTime <= 12)) {
+                if (!soundTriggered) {
+                    doorSound.play();
+                    soundTriggered = true;
+                }
+            }
+        };
 
         doorVid.onended = () => {
             whiteVid.play();
@@ -85,7 +101,6 @@
             }, 1600);
         };
 
-        // Fullscreen Toggle Logic
         fsToggle.onclick = () => {
             if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen();
@@ -94,7 +109,6 @@
             }
         };
 
-        // Handle browser autoplay restrictions
         window.addEventListener('load', () => {
             if (doorVid.paused) {
                 doorVid.play().catch(() => {
