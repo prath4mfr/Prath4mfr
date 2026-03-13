@@ -38,43 +38,47 @@
             width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;
         }
 
-        /* SOCIAL LINKS SECTION */
+        /* SOCIAL LINKS SECTION - FIXED ALIGNMENT & TIGHTER GAP */
         #social-container {
             position: relative; z-index: 50; display: none;
-            flex-direction: column; align-items: center; gap: 20px;
-            padding: 50px 80px; border-radius: 35px; border: 1px solid rgba(255, 255, 255, 0);
+            flex-direction: column; align-items: center; 
+            gap: 12px; /* Tighter vertical gap */
+            padding: 40px 60px; border-radius: 35px; border: 1px solid rgba(255, 255, 255, 0);
             transition: background 1.2s ease, border 1.2s ease, backdrop-filter 1.2s ease;
         }
         
         .glass-active {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.25) !important;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
         }
 
         .social-row {
-            display: flex; align-items: center; gap: 25px;
+            display: flex; align-items: center; 
+            justify-content: center; /* Ensures perfect alignment */
+            gap: 15px; /* Tight gap between icon and text */
             text-decoration: none; position: relative;
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 100%;
         }
 
-        /* Pop Hover Effect */
-        .social-row:hover { transform: scale(1.1); }
+        .social-row:hover { transform: scale(1.08); }
 
         .social-icon {
-            width: 55px; height: 55px; border-radius: 14px;
+            width: 50px; height: 50px; border-radius: 12px;
             opacity: 0; transform: scale(0.5);
             transition: transform 0.8s ease, opacity 0.8s ease;
+            flex-shrink: 0;
         }
 
         .social-text {
-            height: 45px; /* Bigger text PNGs */
-            width: auto; opacity: 0; transform: translateX(20px);
+            height: 65px; /* A lot bigger as requested */
+            width: auto; opacity: 0; 
+            transform: translateX(10px);
             transition: opacity 1s ease, transform 1s ease;
         }
 
-        /* Keyframes */
         @keyframes arriveCenter {
             0% { opacity: 0; transform: scale(0.5) translateY(0); }
             100% { opacity: 1; transform: scale(1) translateY(var(--y-dest)); }
@@ -135,11 +139,11 @@
     </div>
 
     <div id="social-container">
-        <a href="https://www.instagram.com/prath4mfr/" class="social-row" style="--y-dest: -140px;">
+        <a href="https://www.instagram.com/prath4mfr/" class="social-row" style="--y-dest: -160px;">
             <img src="instagramicon.png" class="social-icon">
             <img src="instagram.png" class="social-text">
         </a>
-        <a href="https://open.spotify.com/user/s9s8a7ps81ln4nzxvxtfcp0yw?si=167602c5d3904a48" class="social-row" style="--y-dest: -70px;">
+        <a href="https://open.spotify.com/user/s9s8a7ps81ln4nzxvxtfcp0yw?si=167602c5d3904a48" class="social-row" style="--y-dest: -80px;">
             <img src="spotifyicon.png" class="social-icon">
             <img src="spotify.png" class="social-text">
         </a>
@@ -147,11 +151,11 @@
             <img src="pinteresticon.png" class="social-icon">
             <img src="pinterest.png" class="social-text">
         </a>
-        <a href="https://x.com/PrathamPoswal" class="social-row" style="--y-dest: 70px;">
+        <a href="https://x.com/PrathamPoswal" class="social-row" style="--y-dest: 80px;">
             <img src="xicon.png" class="social-icon">
             <img src="x.png" class="social-text">
         </a>
-        <a href="https://www.reddit.com/user/EstablishmentRich970/" class="social-row" style="--y-dest: 140px;">
+        <a href="https://www.reddit.com/user/EstablishmentRich970/" class="social-row" style="--y-dest: 160px;">
             <img src="redditicon.png" class="social-icon">
             <img src="reddit.png" class="social-text">
         </a>
@@ -237,17 +241,17 @@
                 const icon = row.querySelector('.social-icon');
                 const text = row.querySelector('.social-text');
                 
-                // 1. Icons arrive and stack vertically
+                // 1. Icons arrive stacked in center
                 icon.style.animation = `arriveCenter 1s forwards ${i * 0.3}s`;
                 
-                // 2. Wait for all icons to settle, then shift left & show text
+                // 2. Shift left and reveal big text
                 setTimeout(() => {
-                    icon.style.transform = `translateX(-80px) translateY(var(--y-dest))`;
+                    icon.style.transform = `translateX(-50px) translateY(var(--y-dest))`;
                     setTimeout(() => { 
                         text.style.opacity = '1'; 
                         text.style.transform = 'translateX(0)';
                         
-                        // 3. Finally, load the glassy background
+                        // 3. Glass background fade-in
                         if(i === rows.length - 1) {
                             setTimeout(() => {
                                 socialContainer.classList.add('glass-active');
