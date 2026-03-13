@@ -44,9 +44,15 @@
             transition: opacity 2.5s ease, border 2.5s ease, background 2.5s ease, backdrop-filter 2.5s ease;
         }
 
-        .nav-icon { width: 180px; height: auto; cursor: pointer; }
+        /* Restored Pop Effect */
+        .nav-icon { 
+            width: 180px; height: auto; cursor: pointer; 
+            transition: transform 0.3s ease; 
+        }
+        .nav-icon:hover { 
+            transform: scale(1.1); 
+        }
         
-        /* The transparent cover style */
         .final-border { 
             border: 1px solid rgba(255, 255, 255, 0.2) !important; 
             background: rgba(255, 255, 255, 0.08) !important; 
@@ -89,13 +95,23 @@
         .side-btn { width: 22px; height: 22px; font-size: 8px; }
         .main-btn { width: 32px; height: 32px; font-size: 11px; }
 
+        /* Album Modal & Zoom Mechanic */
         #album-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85); z-index: 200; display: none;
             justify-content: center; align-items: center; backdrop-filter: blur(15px);
+            cursor: zoom-out;
         }
-        #album-modal img { width: 80%; max-width: 500px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        #close-album { position: absolute; top: 30px; right: 30px; font-size: 30px; color: white; cursor: pointer; opacity: 0.7; }
+        #album-modal img { 
+            width: 80%; max-width: 500px; border-radius: 20px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: default;
+        }
+        #album-modal.zoomed img {
+            transform: scale(1.15);
+        }
+        #close-album { position: absolute; top: 30px; right: 30px; font-size: 30px; color: white; cursor: pointer; opacity: 0.7; z-index: 201; }
     </style>
 </head>
 <body>
@@ -121,7 +137,7 @@
 
     <div id="album-modal">
         <span id="close-album">&times;</span>
-        <img src="currentscover.jpg">
+        <img src="currentscover.jpg" id="modal-img">
     </div>
 
     <audio id="bg-music" preload="auto"></audio>
@@ -162,9 +178,10 @@
         const navSidebar = document.getElementById('nav-sidebar');
         const musicUI = document.getElementById('music-controls-wrapper');
         const skipBtn = document.getElementById('skip-btn');
+        const albumModal = document.getElementById('album-modal');
 
         let currentTrackIndex = parseInt(localStorage.getItem('trackIndex')) || 1;
-        let borderTriggered = false; // Persistent flag for the loop
+        let borderTriggered = false;
 
         function formatTime(secs) {
             const min = Math.floor(secs / 60);
@@ -178,11 +195,8 @@
             audio.src = playlist[index].file;
             document.getElementById('display-song-name').innerText = playlist[index].name;
             audio.currentTime = startTime;
-            
             const savedVol = localStorage.getItem('globalVolume') || 0.5;
-            audio.volume = savedVol; 
-            volSlider.value = savedVol;
-
+            audio.volume = savedVol; volSlider.value = savedVol;
             if (localStorage.getItem('isPaused') === 'true') { 
                 audio.pause(); document.getElementById('toggle-btn').innerHTML = '▶'; 
             } else { 
@@ -233,9 +247,8 @@
                 setTimeout(() => { if(video.currentTime >= midPoint) skipBtn.style.display = "none"; }, 1000);
             }
 
-            // TRIGGER BORDER 6s BEFORE END AND KEEP IT
             if (video.duration && video.currentTime > (video.duration - 6)) {
-                borderTriggered = true; // Set flag to true
+                borderTriggered = true;
             }
 
             if (borderTriggered) {
@@ -249,38 +262,33 @@
             video.currentTime = skipPoint; 
         };
 
-        document.getElementById('album-art').onclick = () => document.getElementById('album-modal').style.display = 'flex';
-        document.getElementById('close-album').onclick = () => document.getElementById('album-modal').style.display = 'none';
+        // Modal Zoom Mechanics
+        document.getElementById('album-art').onclick = () => {
+            albumModal.style.display = 'flex';
+            setTimeout(() => albumModal.classList.add('zoomed'), 10);
+        };
         
+        const closeModal = () => {
+            albumModal.classList.remove('zoomed');
+            setTimeout(() => albumModal.style.display = 'none', 300);
+        };
+
+        document.getElementById('close-album').onclick = closeModal;
+        albumModal.onclick = (e) => { if(e.target === albumModal) closeModal(); };
+
         document.getElementById('toggle-btn').onclick = () => {
-            if (audio.paused) { 
-                audio.play(); 
-                document.getElementById('toggle-btn').innerHTML = '❚❚'; 
-                localStorage.setItem('isPaused', 'false'); 
-            } else { 
-                audio.pause(); 
-                document.getElementById('toggle-btn').innerHTML = '▶'; 
-                localStorage.setItem('isPaused', 'true'); 
-            }
+            if (audio.paused) { audio.play(); document.getElementById('toggle-btn').innerHTML = '❚❚'; localStorage.setItem('isPaused', 'false'); }
+            else { audio.pause(); document.getElementById('toggle-btn').innerHTML = '▶'; localStorage.setItem('isPaused', 'true'); }
         };
 
         document.getElementById('next-btn').onclick = () => loadTrack((currentTrackIndex + 1) % playlist.length);
         document.getElementById('prev-btn').onclick = () => loadTrack((currentTrackIndex - 1 + playlist.length) % playlist.length);
-        
-        volSlider.oninput = (e) => { 
-            audio.volume = e.target.value; 
-            localStorage.setItem('globalVolume', e.target.value); 
-        };
-
+        volSlider.oninput = (e) => { audio.volume = e.target.value; localStorage.setItem('globalVolume', e.target.value); };
         document.getElementById('music-progress').oninput = () => {
             audio.currentTime = (document.getElementById('music-progress').value / 100) * audio.duration;
             localStorage.setItem('musicTime', audio.currentTime);
         };
-
-        document.getElementById('fs-toggle').onclick = () => { 
-            if (!document.fullscreenElement) document.documentElement.requestFullscreen(); 
-            else document.exitFullscreen(); 
-        };
+        document.getElementById('fs-toggle').onclick = () => { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); };
     </script>
 </body>
 </html>
