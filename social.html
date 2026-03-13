@@ -62,6 +62,26 @@
         .main-btn { width: 32px; height: 32px; font-size: 11px; }
 
         .show-ui { opacity: 1 !important; display: flex !important; }
+
+        /* ALBUM MODAL STYLES */
+        #album-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0); z-index: 200; display: none;
+            justify-content: center; align-items: center; 
+            backdrop-filter: blur(0px); transition: all 0.4s ease;
+        }
+        #album-modal.active {
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(15px);
+        }
+        #album-modal img { 
+            width: 80%; max-width: 500px; border-radius: 20px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transform: scale(0.8); opacity: 0;
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+        }
+        #album-modal.active img { transform: scale(1); opacity: 1; }
+        #close-album { position: absolute; top: 30px; right: 30px; font-size: 30px; color: white; cursor: pointer; opacity: 0.7; z-index: 201; }
     </style>
 </head>
 <body>
@@ -88,7 +108,7 @@
 
     <div id="music-controls-wrapper">
         <div id="player-container">
-            <img id="album-art" style="width:45px; border-radius:6px;">
+            <img id="album-art" style="width:45px; border-radius:6px; cursor:pointer;">
             <div class="time-container"><span id="time-current">0:00</span><span id="time-total">0:00</span></div>
             <input type="range" id="music-progress" min="0" max="100" value="0">
             <span id="display-song-name" class="song-name"></span>
@@ -104,11 +124,16 @@
         </div>
     </div>
 
+    <div id="album-modal">
+        <span id="close-album">&times;</span>
+        <img id="modal-img" src="">
+    </div>
+
     <script>
         const playlist = [
             { name: "Mop", file: "mop.mp3", cover: "mop.png" },
             { name: "No Surprises", file: "nosurprise.mp3", cover: "nosurprise.png" },
-            { name: "Sloppy Joe", file: "sloppyjoe.mp3", cover: "sloppyjoe.png" },
+            { name: "Sloppy Joe", file: "sloppyjoe.mp3", cover: "sloppyjoe.jpg" },
             { name: "Venus as a Boy", file: "venusasaboy.mp3", cover: "venusasaboy.png" }
         ];
 
@@ -122,6 +147,8 @@
         const toggleBtn = document.getElementById('toggle-btn');
         const volSlider = document.getElementById('volume-slider');
         const musicProgress = document.getElementById('music-progress');
+        const albumModal = document.getElementById('album-modal');
+        const modalImg = document.getElementById('modal-img');
 
         let currentTrackIndex = parseInt(localStorage.getItem('socialTrackIndex')) || 0;
         let soundTriggered = false;
@@ -138,6 +165,7 @@
             const track = playlist[index];
             audio.src = track.file;
             albumArt.src = track.cover;
+            modalImg.src = track.cover;
             songNameDisplay.innerText = track.name;
             audio.currentTime = startTime;
 
@@ -146,32 +174,22 @@
             volSlider.value = savedVol;
 
             if (localStorage.getItem('socialIsPaused') === 'true') {
-                audio.pause();
-                toggleBtn.innerHTML = '▶';
-            } else {
-                audio.play();
-                toggleBtn.innerHTML = '❚❚';
-            }
+                audio.pause(); toggleBtn.innerHTML = '▶';
+            } else { audio.play(); toggleBtn.innerHTML = '❚❚'; }
         }
 
         function fadeAudioIn(audioElement) {
-            audioElement.volume = 0;
-            audioElement.play();
+            audioElement.volume = 0; audioElement.play();
             let vol = 0;
             const interval = setInterval(() => {
-                if (vol < 1) {
-                    vol += 0.05;
-                    audioElement.volume = Math.min(vol, 1);
+                if (vol < 1) { vol += 0.05; audioElement.volume = Math.min(vol, 1);
                 } else { clearInterval(interval); }
             }, 100);
         }
 
         doorVid.ontimeupdate = () => {
             if (doorVid.duration && (doorVid.duration - doorVid.currentTime <= 12)) {
-                if (!soundTriggered) {
-                    fadeAudioIn(doorSound);
-                    soundTriggered = true;
-                }
+                if (!soundTriggered) { fadeAudioIn(doorSound); soundTriggered = true; }
             }
         };
 
@@ -186,25 +204,27 @@
             setTimeout(() => { doorVid.style.display = 'none'; }, 1600);
         };
 
+        // Modal Logic
+        albumArt.onclick = () => {
+            albumModal.style.display = 'flex';
+            setTimeout(() => albumModal.classList.add('active'), 10);
+        };
+        const closeModal = () => {
+            albumModal.classList.remove('active');
+            setTimeout(() => albumModal.style.display = 'none', 500);
+        };
+        document.getElementById('close-album').onclick = closeModal;
+        albumModal.onclick = (e) => { if(e.target === albumModal) closeModal(); };
+
         toggleBtn.onclick = () => {
-            if (audio.paused) {
-                audio.play();
-                toggleBtn.innerHTML = '❚❚';
-                localStorage.setItem('socialIsPaused', 'false');
-            } else {
-                audio.pause();
-                toggleBtn.innerHTML = '▶';
-                localStorage.setItem('socialIsPaused', 'true');
-            }
+            if (audio.paused) { audio.play(); toggleBtn.innerHTML = '❚❚'; localStorage.setItem('socialIsPaused', 'false');
+            } else { audio.pause(); toggleBtn.innerHTML = '▶'; localStorage.setItem('socialIsPaused', 'true'); }
         };
 
         document.getElementById('next-btn').onclick = () => loadTrack((currentTrackIndex + 1) % playlist.length);
         document.getElementById('prev-btn').onclick = () => loadTrack((currentTrackIndex - 1 + playlist.length) % playlist.length);
         
-        volSlider.oninput = (e) => {
-            audio.volume = e.target.value;
-            localStorage.setItem('globalVolume', e.target.value);
-        };
+        volSlider.oninput = (e) => { audio.volume = e.target.value; localStorage.setItem('globalVolume', e.target.value); };
         
         audio.ontimeupdate = () => {
             if (audio.duration) {
@@ -215,33 +235,24 @@
             }
         };
 
-        musicProgress.oninput = () => {
-            audio.currentTime = (musicProgress.value / 100) * audio.duration;
-        };
+        musicProgress.oninput = () => { audio.currentTime = (musicProgress.value / 100) * audio.duration; };
 
-        // Fullscreen Toggle
         document.getElementById('fs-toggle').onclick = () => {
             if (!document.fullscreenElement) document.documentElement.requestFullscreen();
             else document.exitFullscreen();
         };
 
-        // Persistent Refresh Logic
         window.addEventListener('load', () => {
-            if (performance.navigation.type === 1) { // If refreshed
+            if (performance.navigation.type === 1) { 
                 doorVid.style.display = 'none';
-                whiteVid.style.opacity = '1';
-                whiteVid.play();
+                whiteVid.style.opacity = '1'; whiteVid.play();
                 musicUI.classList.add('show-ui');
                 const savedTime = parseFloat(localStorage.getItem('socialMusicTime')) || 0;
                 loadTrack(currentTrackIndex, savedTime);
             } else {
-                if (doorVid.paused) {
-                    doorVid.play().catch(() => {
-                        doorVid.style.display = 'none';
-                        whiteVid.style.opacity = '1';
-                        whiteVid.play();
-                    });
-                }
+                if (doorVid.paused) { doorVid.play().catch(() => {
+                    doorVid.style.display = 'none'; whiteVid.style.opacity = '1'; whiteVid.play();
+                });}
             }
         });
     </script>
