@@ -31,15 +31,29 @@
 
         #start-container {
             position: relative; z-index: 25; cursor: pointer;
-            padding: 15px 35px; background: rgba(255, 255, 255, 0.05);
+            padding: 25px 35px; background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 25px;
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            /* Added Flex to stack PNG and Text */
+            display: flex; flex-direction: column; align-items: center; gap: 15px;
         }
 
         #start-container:hover { transform: scale(1.05); background: rgba(255, 255, 255, 0.1); }
         #click2cry-btn { width: 190px; max-width: 70vw; height: auto; display: block; }
+
+        /* 8-BIT TEXT STYLE */
+        .enter-text {
+            color: white;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.8;
+            text-shadow: 2px 2px #000;
+        }
 
         .pop-animation { animation: pop-out 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
         @keyframes pop-out { 0% { transform: scale(1.05); opacity: 1; } 100% { transform: scale(0); opacity: 0; } }
@@ -59,6 +73,7 @@
 
     <div id="start-container">
         <img src="click2cry.png" id="click2cry-btn">
+        <span class="enter-text">Click to Enter</span>
     </div>
 
     <div id="theme-picker">
@@ -107,8 +122,7 @@
         // Try to resume FS on load if the user already clicked it elsewhere
         window.addEventListener('load', () => {
             if (sessionStorage.getItem('isFS') === 'true' && !document.fullscreenElement) {
-                // Browsers usually require a click to trigger FS, 
-                // so this will sync once they click "Enter"
+                // Browsers usually require a click to trigger FS
             }
         });
     </script>
