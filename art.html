@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unavailable</title>
+    <link rel="icon" type="image/png" href="ballicon.png">
+    <style>
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            overflow: hidden; background-color: #fff;
+            display: flex; justify-content: center; align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        .video-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+        }
+
+        video {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover;
+        }
+
+        .content-card {
+            position: relative; z-index: 50;
+            display: flex; flex-direction: column; align-items: center;
+            padding: 50px 60px; border-radius: 35px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white; text-align: center;
+        }
+
+        h1 { font-size: 24px; letter-spacing: 4px; margin-bottom: 10px; opacity: 0.9; }
+        p { font-size: 12px; opacity: 0.6; margin-bottom: 30px; letter-spacing: 1px; }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white; padding: 12px 30px; border-radius: 30px; cursor: pointer;
+            text-decoration: none; font-size: 11px; letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="video-container">
+        <video autoplay muted loop playsinline>
+            <source src="whitespace.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <div class="content-card">
+        <h1>COMING SOON</h1>
+        <p>This section is currently under maintenance.</p>
+        <a href="home.html" class="back-btn">GO BACK</a>
+    </div>
+
+</body>
+</html>
