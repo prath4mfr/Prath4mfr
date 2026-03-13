@@ -8,12 +8,14 @@
     <style>
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
-            overflow: hidden; background-color: #fff; /* Start white for the fade */
+            overflow: hidden; background-color: #fff;
             display: flex; justify-content: center; align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         .video-container {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
         }
 
         video {
@@ -24,14 +26,32 @@
         #door-video { z-index: 2; }
         #whitespace-video { z-index: 1; opacity: 0; }
 
-        /* Navigation or Social UI can go here later */
-        #social-ui {
+        /* UI CONTROLS */
+        .top-left-controls {
+            position: fixed; top: 10px; left: 10px; z-index: 100;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white; padding: 8px; border-radius: 8px; cursor: pointer;
+            backdrop-filter: blur(10px); font-size: 14px; opacity: 0.6; transition: opacity 0.3s;
+            width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;
+        }
+        .icon-btn:hover { opacity: 1; }
+
+        #social-content {
             position: relative; z-index: 10; opacity: 0;
             transition: opacity 2s ease;
         }
     </style>
 </head>
 <body>
+
+    <div class="top-left-controls">
+        <button id="fs-toggle" class="icon-btn">⛶</button>
+        <button id="back-btn" class="icon-btn" onclick="window.location.href='home.html'">⇠</button>
+    </div>
 
     <div class="video-container">
         <video id="door-video" autoplay muted playsinline>
@@ -42,39 +62,42 @@
         </video>
     </div>
 
-    <div id="social-ui">
+    <div id="social-content">
         </div>
 
     <script>
         const doorVid = document.getElementById('door-video');
         const whiteVid = document.getElementById('whitespace-video');
-        const socialUI = document.getElementById('social-ui');
+        const socialContent = document.getElementById('social-content');
+        const fsToggle = document.getElementById('fs-toggle');
 
         doorVid.onended = () => {
-            // Start the loop video in the background
             whiteVid.play();
-            
-            // Fade out the door video to reveal white
             doorVid.style.opacity = '0';
             
-            // Fade in the whitespace loop from the white screen
             setTimeout(() => {
                 whiteVid.style.opacity = '1';
-                // Show UI after background is settled
-                socialUI.style.opacity = '1';
+                socialContent.style.opacity = '1';
             }, 100);
 
-            // Clean up the door video element after fade
             setTimeout(() => {
                 doorVid.style.display = 'none';
             }, 1600);
         };
 
-        // Fallback: If the video fails to autoplay or end, force transition
+        // Fullscreen Toggle Logic
+        fsToggle.onclick = () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        };
+
+        // Handle browser autoplay restrictions
         window.addEventListener('load', () => {
             if (doorVid.paused) {
                 doorVid.play().catch(() => {
-                    // If blocked, just show whitespace
                     doorVid.style.display = 'none';
                     whiteVid.style.opacity = '1';
                     whiteVid.play();
