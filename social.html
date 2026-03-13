@@ -38,6 +38,49 @@
             width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;
         }
 
+        /* SOCIAL LINKS ANIMATION SECTION */
+        #social-container {
+            position: relative; z-index: 50; display: none;
+            flex-direction: column; align-items: center; gap: 15px;
+            padding: 40px; border-radius: 30px;
+            transition: background 1s ease, backdrop-filter 1s ease;
+        }
+        
+        /* The Glassy Background that loads after animation */
+        .glass-active {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .social-row {
+            display: flex; align-items: center; gap: 20px;
+            text-decoration: none; position: relative;
+        }
+
+        .social-icon {
+            width: 50px; height: 50px; border-radius: 12px;
+            opacity: 0; transform: scale(0.5);
+        }
+
+        .social-text {
+            height: 30px; opacity: 0; transform: translateX(-10px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        /* Animation Steps */
+        @keyframes fadeInMove {
+            0% { opacity: 0; transform: scale(0.5) translateY(0); }
+            50% { opacity: 1; transform: scale(1.1) translateY(0); }
+            100% { opacity: 1; transform: scale(1) translateY(var(--y-dest)); }
+        }
+
+        @keyframes shiftLeft {
+            to { transform: translateX(-60px) translateY(var(--y-dest)); }
+        }
+
+        /* Music Player Styles */
         #music-controls-wrapper {
             position: fixed; bottom: 20px; right: 20px;
             display: none; align-items: stretch; gap: 10px; z-index: 15;
@@ -63,23 +106,14 @@
 
         .show-ui { opacity: 1 !important; display: flex !important; }
 
-        /* ALBUM MODAL STYLES */
         #album-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0); z-index: 200; display: none;
             justify-content: center; align-items: center; 
             backdrop-filter: blur(0px); transition: all 0.4s ease;
         }
-        #album-modal.active {
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(15px);
-        }
-        #album-modal img { 
-            width: 80%; max-width: 500px; border-radius: 20px; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            transform: scale(0.8); opacity: 0;
-            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
-        }
+        #album-modal.active { background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); }
+        #album-modal img { width: 80%; max-width: 500px; border-radius: 20px; transform: scale(0.8); opacity: 0; transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease; }
         #album-modal.active img { transform: scale(1); opacity: 1; }
         #close-album { position: absolute; top: 30px; right: 30px; font-size: 30px; color: white; cursor: pointer; opacity: 0.7; z-index: 201; }
     </style>
@@ -100,10 +134,30 @@
         </video>
     </div>
 
-    <audio id="door-sound">
-        <source src="doorsound.mp3" type="audio/mpeg">
-    </audio>
+    <div id="social-container">
+        <a href="https://www.instagram.com/prath4mfr/" class="social-row" style="--y-dest: -130px;">
+            <img src="instagram.jpg" class="social-icon">
+            <img src="instagram.png" class="social-text">
+        </a>
+        <a href="https://open.spotify.com/user/s9s8a7ps81ln4nzxvxtfcp0yw?si=167602c5d3904a48" class="social-row" style="--y-dest: -65px;">
+            <img src="spotify.jpg" class="social-icon">
+            <img src="spotify.png" class="social-text">
+        </a>
+        <a href="https://in.pinterest.com/Prath4mfr/" class="social-row" style="--y-dest: 0px;">
+            <img src="pinterest.jpg" class="social-icon">
+            <img src="pinterest.png" class="social-text">
+        </a>
+        <a href="https://x.com/PrathamPoswal" class="social-row" style="--y-dest: 65px;">
+            <img src="x.jpg" class="social-icon">
+            <img src="x.png" class="social-text">
+        </a>
+        <a href="https://www.reddit.com/user/EstablishmentRich970/" class="social-row" style="--y-dest: 130px;">
+            <img src="reddit.jpg" class="social-icon">
+            <img src="reddit.png" class="social-text">
+        </a>
+    </div>
 
+    <audio id="door-sound"><source src="doorsound.mp3" type="audio/mpeg"></audio>
     <audio id="bg-music" preload="auto"></audio>
 
     <div id="music-controls-wrapper">
@@ -124,10 +178,7 @@
         </div>
     </div>
 
-    <div id="album-modal">
-        <span id="close-album">&times;</span>
-        <img id="modal-img" src="">
-    </div>
+    <div id="album-modal"><span id="close-album">&times;</span><img id="modal-img" src=""></div>
 
     <script>
         const playlist = [
@@ -149,13 +200,13 @@
         const musicProgress = document.getElementById('music-progress');
         const albumModal = document.getElementById('album-modal');
         const modalImg = document.getElementById('modal-img');
+        const socialContainer = document.getElementById('social-container');
 
         let currentTrackIndex = parseInt(localStorage.getItem('socialTrackIndex')) || 0;
         let soundTriggered = false;
 
         function formatTime(secs) {
-            const min = Math.floor(secs / 60);
-            const sec = Math.floor(secs % 60);
+            const min = Math.floor(secs / 60); const sec = Math.floor(secs % 60);
             return `${min}:${sec < 10 ? '0' : ''}${sec}`;
         }
 
@@ -163,28 +214,43 @@
             currentTrackIndex = index;
             localStorage.setItem('socialTrackIndex', index);
             const track = playlist[index];
-            audio.src = track.file;
-            albumArt.src = track.cover;
-            modalImg.src = track.cover;
-            songNameDisplay.innerText = track.name;
-            audio.currentTime = startTime;
-
+            audio.src = track.file; albumArt.src = track.cover; modalImg.src = track.cover;
+            songNameDisplay.innerText = track.name; audio.currentTime = startTime;
             const savedVol = localStorage.getItem('globalVolume') || 0.5;
-            audio.volume = savedVol;
-            volSlider.value = savedVol;
-
-            if (localStorage.getItem('socialIsPaused') === 'true') {
-                audio.pause(); toggleBtn.innerHTML = '▶';
-            } else { audio.play(); toggleBtn.innerHTML = '❚❚'; }
+            audio.volume = savedVol; volSlider.value = savedVol;
+            if (localStorage.getItem('socialIsPaused') === 'true') { audio.pause(); toggleBtn.innerHTML = '▶'; } 
+            else { audio.play(); toggleBtn.innerHTML = '❚❚'; }
         }
 
         function fadeAudioIn(audioElement) {
             audioElement.volume = 0; audioElement.play();
-            let vol = 0;
-            const interval = setInterval(() => {
-                if (vol < 1) { vol += 0.05; audioElement.volume = Math.min(vol, 1);
-                } else { clearInterval(interval); }
+            let vol = 0; const interval = setInterval(() => {
+                if (vol < 1) { vol += 0.05; audioElement.volume = Math.min(vol, 1); } else { clearInterval(interval); }
             }, 100);
+        }
+
+        function startSocialAnimation() {
+            socialContainer.style.display = 'flex';
+            const rows = document.querySelectorAll('.social-row');
+            
+            rows.forEach((row, i) => {
+                const icon = row.querySelector('.social-icon');
+                const text = row.querySelector('.social-text');
+                
+                // 1. Icons appear and stack vertically
+                icon.style.animation = `fadeInMove 0.8s forwards ${i * 0.2}s`;
+                
+                // 2. Icons shift left and text fades in
+                setTimeout(() => {
+                    icon.style.animation = `shiftLeft 0.6s forwards`;
+                    setTimeout(() => { 
+                        text.style.opacity = '1'; 
+                        text.style.transform = 'translateX(0)';
+                        // Load Glass Background at the end
+                        if(i === rows.length - 1) socialContainer.classList.add('glass-active');
+                    }, 400);
+                }, 1500);
+            });
         }
 
         doorVid.ontimeupdate = () => {
@@ -200,32 +266,24 @@
                 whiteVid.style.opacity = '1';
                 musicUI.classList.add('show-ui');
                 loadTrack(currentTrackIndex);
+                startSocialAnimation();
             }, 100);
             setTimeout(() => { doorVid.style.display = 'none'; }, 1600);
         };
 
-        // Modal Logic
-        albumArt.onclick = () => {
-            albumModal.style.display = 'flex';
-            setTimeout(() => albumModal.classList.add('active'), 10);
-        };
-        const closeModal = () => {
-            albumModal.classList.remove('active');
-            setTimeout(() => albumModal.style.display = 'none', 500);
-        };
+        albumArt.onclick = () => { albumModal.style.display = 'flex'; setTimeout(() => albumModal.classList.add('active'), 10); };
+        const closeModal = () => { albumModal.classList.remove('active'); setTimeout(() => albumModal.style.display = 'none', 500); };
         document.getElementById('close-album').onclick = closeModal;
         albumModal.onclick = (e) => { if(e.target === albumModal) closeModal(); };
 
         toggleBtn.onclick = () => {
-            if (audio.paused) { audio.play(); toggleBtn.innerHTML = '❚❚'; localStorage.setItem('socialIsPaused', 'false');
-            } else { audio.pause(); toggleBtn.innerHTML = '▶'; localStorage.setItem('socialIsPaused', 'true'); }
+            if (audio.paused) { audio.play(); toggleBtn.innerHTML = '❚❚'; localStorage.setItem('socialIsPaused', 'false'); } 
+            else { audio.pause(); toggleBtn.innerHTML = '▶'; localStorage.setItem('socialIsPaused', 'true'); }
         };
 
         document.getElementById('next-btn').onclick = () => loadTrack((currentTrackIndex + 1) % playlist.length);
         document.getElementById('prev-btn').onclick = () => loadTrack((currentTrackIndex - 1 + playlist.length) % playlist.length);
-        
         volSlider.oninput = (e) => { audio.volume = e.target.value; localStorage.setItem('globalVolume', e.target.value); };
-        
         audio.ontimeupdate = () => {
             if (audio.duration) {
                 musicProgress.value = (audio.currentTime / audio.duration) * 100;
@@ -234,7 +292,6 @@
                 localStorage.setItem('socialMusicTime', audio.currentTime);
             }
         };
-
         musicProgress.oninput = () => { audio.currentTime = (musicProgress.value / 100) * audio.duration; };
 
         document.getElementById('fs-toggle').onclick = () => {
@@ -244,15 +301,11 @@
 
         window.addEventListener('load', () => {
             if (performance.navigation.type === 1) { 
-                doorVid.style.display = 'none';
-                whiteVid.style.opacity = '1'; whiteVid.play();
-                musicUI.classList.add('show-ui');
-                const savedTime = parseFloat(localStorage.getItem('socialMusicTime')) || 0;
-                loadTrack(currentTrackIndex, savedTime);
-            } else {
-                if (doorVid.paused) { doorVid.play().catch(() => {
-                    doorVid.style.display = 'none'; whiteVid.style.opacity = '1'; whiteVid.play();
-                });}
+                doorVid.style.display = 'none'; whiteVid.style.opacity = '1'; whiteVid.play();
+                musicUI.classList.add('show-ui'); loadTrack(currentTrackIndex, parseFloat(localStorage.getItem('socialMusicTime')) || 0);
+                startSocialAnimation();
+            } else if (doorVid.paused) {
+                doorVid.play().catch(() => { doorVid.style.display = 'none'; whiteVid.style.opacity = '1'; whiteVid.play(); });
             }
         });
     </script>
