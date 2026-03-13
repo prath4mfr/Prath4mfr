@@ -3,92 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Socials</title>
-    <meta name="p:domain_verify" content="a73c98a7c9dafba8c0c336e1e9b912c0"/>
-    <link rel="icon" type="image/jpeg" href="ballicon.jpg">
-    
+    <title>Social</title>
+    <link rel="icon" type="image/png" href="ballicon.png">
     <style>
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
-            overflow: hidden; background-color: #000;
+            overflow: hidden; background-color: #fff; /* Start white for the fade */
             display: flex; justify-content: center; align-items: center;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
-        #background-video {
+        .video-container {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            object-fit: cover; z-index: 1;
         }
 
-        /* Social Container */
-        .social-container {
-            position: relative;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-            padding: 40px;
-            border-radius: 40px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-            transition: transform 0.3s ease;
+        video {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover; transition: opacity 1.5s ease-in-out;
         }
 
-        .social-link {
-            text-decoration: none;
-            color: white;
-            font-size: 24px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            padding: 15px 30px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.05);
-        }
+        #door-video { z-index: 2; }
+        #whitespace-video { z-index: 1; opacity: 0; }
 
-        .social-link:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.05);
-        }
-
-        /* Back Button */
-        #back-btn {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 20;
-            color: white;
-            text-decoration: none;
-            font-size: 14px;
-            opacity: 0.6;
-            transition: opacity 0.3s ease;
-        }
-        #back-btn:hover { opacity: 1; }
-
-        @media only screen and (max-width: 768px) {
-            .social-link {
-                font-size: 20px;
-                padding: 20px 40px; /* Big asf for mobile */
-            }
+        /* Navigation or Social UI can go here later */
+        #social-ui {
+            position: relative; z-index: 10; opacity: 0;
+            transition: opacity 2s ease;
         }
     </style>
 </head>
 <body>
 
-    <a href="index.html" id="back-btn">← BACK</a>
+    <div class="video-container">
+        <video id="door-video" autoplay muted playsinline>
+            <source src="door.mp4" type="video/mp4">
+        </video>
+        <video id="whitespace-video" muted playsinline loop>
+            <source src="whitespace.mp4" type="video/mp4">
+        </video>
+    </div>
 
-    <video id="background-video" autoplay muted loop playsinline>
-        <source src="currents.mp4" type="video/mp4">
-    </video>
-
-    <div class="social-container">
-        <a href="https://www.instagram.com/prath4mfr/" target="_blank" class="social-link">INSTAGRAM</a>
+    <div id="social-ui">
         </div>
 
+    <script>
+        const doorVid = document.getElementById('door-video');
+        const whiteVid = document.getElementById('whitespace-video');
+        const socialUI = document.getElementById('social-ui');
+
+        doorVid.onended = () => {
+            // Start the loop video in the background
+            whiteVid.play();
+            
+            // Fade out the door video to reveal white
+            doorVid.style.opacity = '0';
+            
+            // Fade in the whitespace loop from the white screen
+            setTimeout(() => {
+                whiteVid.style.opacity = '1';
+                // Show UI after background is settled
+                socialUI.style.opacity = '1';
+            }, 100);
+
+            // Clean up the door video element after fade
+            setTimeout(() => {
+                doorVid.style.display = 'none';
+            }, 1600);
+        };
+
+        // Fallback: If the video fails to autoplay or end, force transition
+        window.addEventListener('load', () => {
+            if (doorVid.paused) {
+                doorVid.play().catch(() => {
+                    // If blocked, just show whitespace
+                    doorVid.style.display = 'none';
+                    whiteVid.style.opacity = '1';
+                    whiteVid.play();
+                });
+            }
+        });
+    </script>
 </body>
 </html>
