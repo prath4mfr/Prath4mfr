@@ -38,11 +38,11 @@
             width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;
         }
 
-        /* SOCIAL LINKS SECTION - FIXED ALIGNMENT & TIGHTER GAP */
+        /* SOCIAL LINKS SECTION - PERFECT ALIGNMENT FIX */
         #social-container {
             position: relative; z-index: 50; display: none;
             flex-direction: column; align-items: center; 
-            gap: 12px; /* Tighter vertical gap */
+            gap: 12px;
             padding: 40px 60px; border-radius: 35px; border: 1px solid rgba(255, 255, 255, 0);
             transition: background 1.2s ease, border 1.2s ease, backdrop-filter 1.2s ease;
         }
@@ -55,12 +55,13 @@
         }
 
         .social-row {
-            display: flex; align-items: center; 
-            justify-content: center; /* Ensures perfect alignment */
-            gap: 15px; /* Tight gap between icon and text */
+            display: flex; 
+            align-items: center; /* Vertically centers icon and text */
+            justify-content: flex-start; /* Aligns them from the left of the container */
+            width: 100%;
+            min-width: 300px; /* Ensures text has room to grow */
             text-decoration: none; position: relative;
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            width: 100%;
         }
 
         .social-row:hover { transform: scale(1.08); }
@@ -69,14 +70,15 @@
             width: 50px; height: 50px; border-radius: 12px;
             opacity: 0; transform: scale(0.5);
             transition: transform 0.8s ease, opacity 0.8s ease;
-            flex-shrink: 0;
+            flex-shrink: 0; /* Prevents icon from squishing */
         }
 
         .social-text {
-            height: 65px; /* A lot bigger as requested */
-            width: auto; opacity: 0; 
-            transform: translateX(10px);
-            transition: opacity 1s ease, transform 1s ease;
+            height: 65px; 
+            width: auto; 
+            opacity: 0; 
+            margin-left: 15px; /* Fixed spacing between icon and text */
+            transition: opacity 1s ease;
         }
 
         @keyframes arriveCenter {
@@ -244,12 +246,12 @@
                 // 1. Icons arrive stacked in center
                 icon.style.animation = `arriveCenter 1s forwards ${i * 0.3}s`;
                 
-                // 2. Shift left and reveal big text
+                // 2. Shift the ROW container slightly left and reveal text
                 setTimeout(() => {
-                    icon.style.transform = `translateX(-50px) translateY(var(--y-dest))`;
+                    // We move the icon specifically so text follows in the flex layout
+                    icon.style.transform = `translateX(-60px) translateY(var(--y-dest))`;
                     setTimeout(() => { 
                         text.style.opacity = '1'; 
-                        text.style.transform = 'translateX(0)';
                         
                         // 3. Glass background fade-in
                         if(i === rows.length - 1) {
