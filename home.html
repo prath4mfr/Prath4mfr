@@ -184,10 +184,8 @@
 
         let currentTrackIndex = parseInt(localStorage.getItem('trackIndex')) || 1;
         
-        // Persistent border logic for refresh
         let borderTriggered = localStorage.getItem('borderTriggered') === 'true';
 
-        // Clear border if they actually leave the site (not just refresh)
         window.onbeforeunload = function() {
             localStorage.setItem('leftSite', 'true');
         };
@@ -218,7 +216,6 @@
             }
         }
 
-        // Entrance Logic modified for refresh
         if (sessionStorage.getItem('justEntered') === 'true') {
             sessionStorage.removeItem('justEntered');
             video.currentTime = 3; video.play();
@@ -226,16 +223,16 @@
             setTimeout(() => { skipBtn.style.opacity = "1"; musicUI.classList.add('show-ui'); }, 50);
             loadTrack(currentTrackIndex);
         } else {
-            // This triggers on Refresh: Show skip fading out and PNGs coming in
+            // FIXED REFRESH LOGIC: Start exactly at UI load point
             video.currentTime = 10; video.play();
             musicUI.classList.add('show-ui');
             nameImg.style.display = 'block'; navSidebar.style.display = 'flex';
-            skipBtn.style.display = 'block'; skipBtn.style.opacity = '1';
+            skipBtn.style.display = 'block';
             
             setTimeout(() => { 
                 nameImg.style.opacity = "1"; 
                 navSidebar.style.opacity = "1"; 
-                skipBtn.style.opacity = "0"; // Fade skip out on refresh
+                skipBtn.style.opacity = "1";
             }, 50);
             
             loadTrack(currentTrackIndex, parseFloat(localStorage.getItem('musicTime')) || 0);
@@ -249,6 +246,10 @@
                 localStorage.setItem('musicTime', audio.currentTime);
             }
         };
+
+        window.addEventListener('beforeunload', () => {
+            localStorage.setItem('musicTime', audio.currentTime);
+        });
 
         video.addEventListener('timeupdate', () => {
             if (video.currentTime > 3 && video.currentTime < 5) video.playbackRate = 3.0; 
