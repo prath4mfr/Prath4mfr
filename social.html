@@ -38,6 +38,15 @@
             width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;
         }
 
+        /* SKIP BUTTON STYLE */
+        #skip-btn {
+            position: fixed; bottom: 20px; left: 20px; z-index: 101;
+            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white; padding: 10px 20px; border-radius: 30px; cursor: pointer;
+            backdrop-filter: blur(10px); font-size: 12px; letter-spacing: 1px;
+            transition: opacity 0.5s ease;
+        }
+
         /* SOCIAL LINKS SECTION */
         #social-container {
             position: relative; z-index: 50; display: none;
@@ -62,9 +71,9 @@
             justify-content: center;
             text-decoration: none; 
             width: 100%;
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
-            opacity: 0;
-            height: 90px; /* Increased height to accommodate bigger text */
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease, opacity 0.8s ease;
+            opacity: 0; /* Ensures they fade in */
+            height: 90px; 
         }
 
         .social-row:hover { 
@@ -79,7 +88,7 @@
         }
 
         .social-text {
-            height: 85px; /* Bigger Text PNGs */
+            height: 85px; 
             width: auto; 
             opacity: 0; 
             margin-left: 10px;
@@ -130,6 +139,8 @@
         <button id="fs-toggle" class="icon-btn">⛶</button>
         <button id="back-btn" class="icon-btn" onclick="window.location.href='home.html'">⇠</button>
     </div>
+
+    <button id="skip-btn">SKIP INTRO</button>
 
     <div class="video-container">
         <video id="door-video" autoplay muted playsinline>
@@ -207,6 +218,7 @@
         const albumModal = document.getElementById('album-modal');
         const modalImg = document.getElementById('modal-img');
         const socialContainer = document.getElementById('social-container');
+        const skipBtn = document.getElementById('skip-btn');
 
         let currentTrackIndex = parseInt(localStorage.getItem('socialTrackIndex')) || 0;
         let soundTriggered = false;
@@ -237,6 +249,9 @@
         }
 
         function startSocialAnimation() {
+            skipBtn.style.opacity = '0';
+            setTimeout(() => skipBtn.style.display = 'none', 500);
+            
             socialContainer.style.display = 'flex';
             const rows = document.querySelectorAll('.social-row');
             
@@ -245,7 +260,7 @@
                 const text = row.querySelector('.social-text');
                 
                 setTimeout(() => {
-                    row.style.opacity = '1';
+                    row.style.opacity = '1'; /* Fade in row */
                     row.style.transform = 'scale(1)';
                     
                     setTimeout(() => {
@@ -261,6 +276,18 @@
                 }, i * 300);
             });
         }
+
+        // SKIP LOGIC
+        skipBtn.onclick = () => {
+            doorSound.pause();
+            doorVid.pause();
+            doorVid.style.display = 'none';
+            whiteVid.style.opacity = '1';
+            whiteVid.play();
+            musicUI.classList.add('show-ui');
+            loadTrack(currentTrackIndex);
+            startSocialAnimation();
+        };
 
         doorVid.ontimeupdate = () => {
             if (!isRefreshed && doorVid.duration && (doorVid.duration - doorVid.currentTime <= 12)) {
@@ -311,12 +338,14 @@
         window.addEventListener('load', () => {
             if (performance.navigation.type === 1) { 
                 isRefreshed = true;
+                skipBtn.style.display = 'none';
                 doorVid.style.display = 'none'; whiteVid.style.opacity = '1'; whiteVid.play();
                 musicUI.classList.add('show-ui'); loadTrack(currentTrackIndex, parseFloat(localStorage.getItem('socialMusicTime')) || 0);
                 startSocialAnimation();
             } else if (doorVid.paused) {
                 doorVid.play().catch(() => { 
                     isRefreshed = true;
+                    skipBtn.style.display = 'none';
                     doorVid.style.display = 'none'; whiteVid.style.opacity = '1'; whiteVid.play(); 
                 });
             }
