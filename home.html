@@ -183,60 +183,46 @@
         const albumModal = document.getElementById('album-modal');
 
         let currentTrackIndex = parseInt(localStorage.getItem('trackIndex')) || 1;
-        
         let borderTriggered = localStorage.getItem('borderTriggered') === 'true';
 
-        window.onbeforeunload = function() {
-            localStorage.setItem('leftSite', 'true');
-        };
+        window.onbeforeunload = function() { localStorage.setItem('leftSite', 'true'); };
         if(localStorage.getItem('leftSite') === 'true' && !performance.navigation.type === 1) {
-             localStorage.removeItem('borderTriggered');
-             localStorage.removeItem('leftSite');
+             localStorage.removeItem('borderTriggered'); localStorage.removeItem('leftSite');
              borderTriggered = false;
         }
 
         function formatTime(secs) {
-            const min = Math.floor(secs / 60);
-            const sec = Math.floor(secs % 60);
+            const min = Math.floor(secs / 60); const sec = Math.floor(secs % 60);
             return `${min}:${sec < 10 ? '0' : ''}${sec}`;
         }
 
         function loadTrack(index, startTime = 0) {
-            currentTrackIndex = index;
-            localStorage.setItem('trackIndex', index);
-            audio.src = playlist[index].file;
-            document.getElementById('display-song-name').innerText = playlist[index].name;
+            currentTrackIndex = index; localStorage.setItem('trackIndex', index);
+            audio.src = playlist[index].file; document.getElementById('display-song-name').innerText = playlist[index].name;
             audio.currentTime = startTime;
             const savedVol = localStorage.getItem('globalVolume') || 0.5;
             audio.volume = savedVol; volSlider.value = savedVol;
             if (localStorage.getItem('isPaused') === 'true') { 
                 audio.pause(); document.getElementById('toggle-btn').innerHTML = '▶'; 
-            } else { 
-                audio.play(); document.getElementById('toggle-btn').innerHTML = '❚❚'; 
-            }
+            } else { audio.play(); document.getElementById('toggle-btn').innerHTML = '❚❚'; }
         }
 
-        if (sessionStorage.getItem('justEntered') === 'true') {
-            sessionStorage.removeItem('justEntered');
-            video.currentTime = 3; video.play();
-            skipBtn.style.display = 'block';
-            setTimeout(() => { skipBtn.style.opacity = "1"; musicUI.classList.add('show-ui'); }, 50);
-            loadTrack(currentTrackIndex);
-        } else {
-            // FIXED REFRESH LOGIC: Start exactly at UI load point
-            video.currentTime = 10; video.play();
-            musicUI.classList.add('show-ui');
-            nameImg.style.display = 'block'; navSidebar.style.display = 'flex';
-            skipBtn.style.display = 'block';
-            
-            setTimeout(() => { 
-                nameImg.style.opacity = "1"; 
-                navSidebar.style.opacity = "1"; 
-                skipBtn.style.opacity = "1";
-            }, 50);
-            
-            loadTrack(currentTrackIndex, parseFloat(localStorage.getItem('musicTime')) || 0);
-        }
+        // STARTUP LOGIC
+        video.onloadedmetadata = () => {
+            let mid = video.duration / 2;
+            if (sessionStorage.getItem('justEntered') === 'true') {
+                sessionStorage.removeItem('justEntered');
+                video.currentTime = 3; video.play();
+                skipBtn.style.display = 'block';
+                setTimeout(() => { skipBtn.style.opacity = "1"; musicUI.classList.add('show-ui'); }, 50);
+                loadTrack(currentTrackIndex);
+            } else {
+                // REFRESH POINT: Land exactly at midpoint where PNGs start fading and Skip fades out
+                video.currentTime = mid; video.play();
+                musicUI.classList.add('show-ui');
+                loadTrack(currentTrackIndex, parseFloat(localStorage.getItem('musicTime')) || 0);
+            }
+        };
 
         audio.ontimeupdate = () => {
             if (audio.duration) {
@@ -247,52 +233,44 @@
             }
         };
 
-        window.addEventListener('beforeunload', () => {
-            localStorage.setItem('musicTime', audio.currentTime);
-        });
-
         video.addEventListener('timeupdate', () => {
             if (video.currentTime > 3 && video.currentTime < 5) video.playbackRate = 3.0; 
             else video.playbackRate = 1.0;
 
-            let midPoint = video.duration ? (video.duration / 2) : 10;
+            let midPoint = video.duration / 2;
             
+            // The "Climax" logic: When midpoint is hit
             if (video.currentTime >= midPoint) {
                 if(nameImg.style.display !== 'block') {
                     nameImg.style.display = 'block'; 
                     navSidebar.style.display = 'flex';
+                    // Trigger the original 2.5s fade
                     setTimeout(() => { nameImg.style.opacity = "1"; navSidebar.style.opacity = "1"; }, 10);
                 }
+                // Skip button logic: Hide it at the midpoint
                 skipBtn.style.opacity = "0"; 
                 setTimeout(() => { if(video.currentTime >= midPoint) skipBtn.style.display = "none"; }, 1000);
+            } else {
+                // If before midpoint (like during intro)
+                skipBtn.style.display = 'block';
             }
 
             if (video.duration && video.currentTime > (video.duration - 6)) {
-                borderTriggered = true;
-                localStorage.setItem('borderTriggered', 'true');
+                borderTriggered = true; localStorage.setItem('borderTriggered', 'true');
             }
-
             if (borderTriggered) {
-                nameImg.classList.add('final-border'); 
-                navSidebar.classList.add('final-border');
+                nameImg.classList.add('final-border'); navSidebar.classList.add('final-border');
             }
         });
 
-        skipBtn.onclick = () => { 
-            let skipPoint = video.duration ? (video.duration / 2) + 0.1 : 10.1;
-            video.currentTime = skipPoint; 
-        };
+        skipBtn.onclick = () => { video.currentTime = (video.duration / 2) + 0.1; };
 
         document.getElementById('album-art').onclick = () => {
-            albumModal.style.display = 'flex';
-            setTimeout(() => albumModal.classList.add('active'), 10);
+            albumModal.style.display = 'flex'; setTimeout(() => albumModal.classList.add('active'), 10);
         };
-        
         const closeModal = () => {
-            albumModal.classList.remove('active');
-            setTimeout(() => albumModal.style.display = 'none', 500);
+            albumModal.classList.remove('active'); setTimeout(() => albumModal.style.display = 'none', 500);
         };
-
         document.getElementById('close-album').onclick = closeModal;
         albumModal.onclick = (e) => { if(e.target === albumModal) closeModal(); };
 
