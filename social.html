@@ -38,12 +38,12 @@
             width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;
         }
 
-        /* SOCIAL LINKS SECTION - PERFECT ALIGNMENT FIX */
+        /* SOCIAL LINKS SECTION - FIXED HORIZONTAL ALIGNMENT */
         #social-container {
             position: relative; z-index: 50; display: none;
             flex-direction: column; align-items: center; 
-            gap: 12px;
-            padding: 40px 60px; border-radius: 35px; border: 1px solid rgba(255, 255, 255, 0);
+            gap: 10px; /* Tighter vertical gap */
+            padding: 50px 80px; border-radius: 35px; border: 1px solid rgba(255, 255, 255, 0);
             transition: background 1.2s ease, border 1.2s ease, backdrop-filter 1.2s ease;
         }
         
@@ -56,34 +56,28 @@
 
         .social-row {
             display: flex; 
-            align-items: center; /* Vertically centers icon and text */
-            justify-content: flex-start; /* Aligns them from the left of the container */
+            align-items: center; /* This forces icon and text to align perfectly on their centers */
+            justify-content: center;
+            text-decoration: none; 
             width: 100%;
-            min-width: 300px; /* Ensures text has room to grow */
-            text-decoration: none; position: relative;
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0; /* Hidden initially for animation */
         }
 
-        .social-row:hover { transform: scale(1.08); }
+        .social-row:hover { transform: scale(1.1); }
 
         .social-icon {
             width: 50px; height: 50px; border-radius: 12px;
-            opacity: 0; transform: scale(0.5);
-            transition: transform 0.8s ease, opacity 0.8s ease;
-            flex-shrink: 0; /* Prevents icon from squishing */
+            flex-shrink: 0;
+            transition: transform 0.8s ease;
         }
 
         .social-text {
-            height: 65px; 
+            height: 60px; /* Large text PNGs */
             width: auto; 
             opacity: 0; 
-            margin-left: 15px; /* Fixed spacing between icon and text */
-            transition: opacity 1s ease;
-        }
-
-        @keyframes arriveCenter {
-            0% { opacity: 0; transform: scale(0.5) translateY(0); }
-            100% { opacity: 1; transform: scale(1) translateY(var(--y-dest)); }
+            margin-left: 20px;
+            transition: opacity 0.8s ease;
         }
 
         /* Music Player Styles */
@@ -141,23 +135,23 @@
     </div>
 
     <div id="social-container">
-        <a href="https://www.instagram.com/prath4mfr/" class="social-row" style="--y-dest: -160px;">
+        <a href="https://www.instagram.com/prath4mfr/" class="social-row">
             <img src="instagramicon.png" class="social-icon">
             <img src="instagram.png" class="social-text">
         </a>
-        <a href="https://open.spotify.com/user/s9s8a7ps81ln4nzxvxtfcp0yw?si=167602c5d3904a48" class="social-row" style="--y-dest: -80px;">
+        <a href="https://open.spotify.com/user/s9s8a7ps81ln4nzxvxtfcp0yw?si=167602c5d3904a48" class="social-row">
             <img src="spotifyicon.png" class="social-icon">
             <img src="spotify.png" class="social-text">
         </a>
-        <a href="https://in.pinterest.com/Prath4mfr/" class="social-row" style="--y-dest: 0px;">
+        <a href="https://in.pinterest.com/Prath4mfr/" class="social-row">
             <img src="pinteresticon.png" class="social-icon">
             <img src="pinterest.png" class="social-text">
         </a>
-        <a href="https://x.com/PrathamPoswal" class="social-row" style="--y-dest: 80px;">
+        <a href="https://x.com/PrathamPoswal" class="social-row">
             <img src="xicon.png" class="social-icon">
             <img src="x.png" class="social-text">
         </a>
-        <a href="https://www.reddit.com/user/EstablishmentRich970/" class="social-row" style="--y-dest: 160px;">
+        <a href="https://www.reddit.com/user/EstablishmentRich970/" class="social-row">
             <img src="redditicon.png" class="social-icon">
             <img src="reddit.png" class="social-text">
         </a>
@@ -243,24 +237,23 @@
                 const icon = row.querySelector('.social-icon');
                 const text = row.querySelector('.social-text');
                 
-                // 1. Icons arrive stacked in center
-                icon.style.animation = `arriveCenter 1s forwards ${i * 0.3}s`;
-                
-                // 2. Shift the ROW container slightly left and reveal text
+                // 1. Rows fade in one by one in the center
                 setTimeout(() => {
-                    // We move the icon specifically so text follows in the flex layout
-                    icon.style.transform = `translateX(-60px) translateY(var(--y-dest))`;
-                    setTimeout(() => { 
-                        text.style.opacity = '1'; 
-                        
-                        // 3. Glass background fade-in
-                        if(i === rows.length - 1) {
-                            setTimeout(() => {
-                                socialContainer.classList.add('glass-active');
-                            }, 1000);
-                        }
-                    }, 600);
-                }, 2500); 
+                    row.style.opacity = '1';
+                    row.style.transform = 'scale(1)';
+                    
+                    // 2. After they are all in, slide the icons left and show text
+                    setTimeout(() => {
+                        icon.style.transform = 'translateX(-60px)';
+                        setTimeout(() => { 
+                            text.style.opacity = '1'; 
+                            if(i === rows.length - 1) {
+                                setTimeout(() => socialContainer.classList.add('glass-active'), 800);
+                            }
+                        }, 400);
+                    }, 2000);
+
+                }, i * 300);
             });
         }
 
