@@ -38,46 +38,46 @@
             width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;
         }
 
-        /* SOCIAL LINKS ANIMATION SECTION */
+        /* SOCIAL LINKS SECTION */
         #social-container {
             position: relative; z-index: 50; display: none;
-            flex-direction: column; align-items: center; gap: 15px;
-            padding: 40px; border-radius: 30px;
-            transition: background 1s ease, backdrop-filter 1s ease;
+            flex-direction: column; align-items: center; gap: 20px;
+            padding: 50px 80px; border-radius: 35px; border: 1px solid rgba(255, 255, 255, 0);
+            transition: background 1.2s ease, border 1.2s ease, backdrop-filter 1.2s ease;
         }
         
-        /* The Glassy Background that loads after animation */
         .glass-active {
             background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.25) !important;
         }
 
         .social-row {
-            display: flex; align-items: center; gap: 20px;
+            display: flex; align-items: center; gap: 25px;
             text-decoration: none; position: relative;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
+        /* Pop Hover Effect */
+        .social-row:hover { transform: scale(1.1); }
+
         .social-icon {
-            width: 50px; height: 50px; border-radius: 12px;
+            width: 55px; height: 55px; border-radius: 14px;
             opacity: 0; transform: scale(0.5);
+            transition: transform 0.8s ease, opacity 0.8s ease;
         }
 
         .social-text {
-            height: 30px; opacity: 0; transform: translateX(-10px);
-            transition: opacity 0.8s ease, transform 0.8s ease;
+            height: 45px; /* Bigger text PNGs */
+            width: auto; opacity: 0; transform: translateX(20px);
+            transition: opacity 1s ease, transform 1s ease;
         }
 
-        /* Animation Steps */
-        @keyframes fadeInMove {
+        /* Keyframes */
+        @keyframes arriveCenter {
             0% { opacity: 0; transform: scale(0.5) translateY(0); }
-            50% { opacity: 1; transform: scale(1.1) translateY(0); }
             100% { opacity: 1; transform: scale(1) translateY(var(--y-dest)); }
-        }
-
-        @keyframes shiftLeft {
-            to { transform: translateX(-60px) translateY(var(--y-dest)); }
         }
 
         /* Music Player Styles */
@@ -135,24 +135,24 @@
     </div>
 
     <div id="social-container">
-        <a href="https://www.instagram.com/prath4mfr/" class="social-row" style="--y-dest: -130px;">
-            <img src="instagram.jpg" class="social-icon">
+        <a href="https://www.instagram.com/prath4mfr/" class="social-row" style="--y-dest: -140px;">
+            <img src="instagramicon.png" class="social-icon">
             <img src="instagram.png" class="social-text">
         </a>
-        <a href="https://open.spotify.com/user/s9s8a7ps81ln4nzxvxtfcp0yw?si=167602c5d3904a48" class="social-row" style="--y-dest: -65px;">
-            <img src="spotify.jpg" class="social-icon">
+        <a href="https://open.spotify.com/user/s9s8a7ps81ln4nzxvxtfcp0yw?si=167602c5d3904a48" class="social-row" style="--y-dest: -70px;">
+            <img src="spotifyicon.png" class="social-icon">
             <img src="spotify.png" class="social-text">
         </a>
         <a href="https://in.pinterest.com/Prath4mfr/" class="social-row" style="--y-dest: 0px;">
-            <img src="pinterest.jpg" class="social-icon">
+            <img src="pinteresticon.png" class="social-icon">
             <img src="pinterest.png" class="social-text">
         </a>
-        <a href="https://x.com/PrathamPoswal" class="social-row" style="--y-dest: 65px;">
-            <img src="x.jpg" class="social-icon">
+        <a href="https://x.com/PrathamPoswal" class="social-row" style="--y-dest: 70px;">
+            <img src="xicon.png" class="social-icon">
             <img src="x.png" class="social-text">
         </a>
-        <a href="https://www.reddit.com/user/EstablishmentRich970/" class="social-row" style="--y-dest: 130px;">
-            <img src="reddit.jpg" class="social-icon">
+        <a href="https://www.reddit.com/user/EstablishmentRich970/" class="social-row" style="--y-dest: 140px;">
+            <img src="redditicon.png" class="social-icon">
             <img src="reddit.png" class="social-text">
         </a>
     </div>
@@ -178,7 +178,7 @@
         </div>
     </div>
 
-    <div id="album-modal"><span id="close-album">&times;</span><img id="modal-img" src=""></div>
+    <div id="album-modal"><span id="close-album">×</span><img id="modal-img" src=""></div>
 
     <script>
         const playlist = [
@@ -237,19 +237,24 @@
                 const icon = row.querySelector('.social-icon');
                 const text = row.querySelector('.social-text');
                 
-                // 1. Icons appear and stack vertically
-                icon.style.animation = `fadeInMove 0.8s forwards ${i * 0.2}s`;
+                // 1. Icons arrive and stack vertically
+                icon.style.animation = `arriveCenter 1s forwards ${i * 0.3}s`;
                 
-                // 2. Icons shift left and text fades in
+                // 2. Wait for all icons to settle, then shift left & show text
                 setTimeout(() => {
-                    icon.style.animation = `shiftLeft 0.6s forwards`;
+                    icon.style.transform = `translateX(-80px) translateY(var(--y-dest))`;
                     setTimeout(() => { 
                         text.style.opacity = '1'; 
                         text.style.transform = 'translateX(0)';
-                        // Load Glass Background at the end
-                        if(i === rows.length - 1) socialContainer.classList.add('glass-active');
-                    }, 400);
-                }, 1500);
+                        
+                        // 3. Finally, load the glassy background
+                        if(i === rows.length - 1) {
+                            setTimeout(() => {
+                                socialContainer.classList.add('glass-active');
+                            }, 1000);
+                        }
+                    }, 600);
+                }, 2500); 
             });
         }
 
