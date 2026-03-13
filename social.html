@@ -37,12 +37,31 @@
             backdrop-filter: blur(10px); font-size: 14px; opacity: 0.6; transition: opacity 0.3s;
             width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;
         }
-        .icon-btn:hover { opacity: 1; }
 
-        #social-content {
-            position: relative; z-index: 10; opacity: 0;
-            transition: opacity 2s ease;
+        #music-controls-wrapper {
+            position: fixed; bottom: 20px; right: 20px;
+            display: none; align-items: stretch; gap: 10px; z-index: 15;
+            opacity: 0; transition: opacity 1.5s ease;
         }
+        #player-container {
+            display: flex; flex-direction: column; align-items: center;
+            background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px);
+            padding: 15px; border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.08); color: white;
+        }
+        #volume-container {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px);
+            padding: 15px 10px; border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.08); width: 30px;
+        }
+        #volume-slider { appearance: slider-vertical; -webkit-appearance: slider-vertical; width: 4px; height: 80px; accent-color: #fff; opacity: 0.4; }
+        #music-progress { width: 100px; height: 2px; accent-color: #fff; margin-bottom: 8px; cursor: pointer; }
+        .song-name { font-size: 8px; font-weight: 600; margin-bottom: 10px; text-transform: uppercase; opacity: 0.6; text-align: center; width: 100px; }
+        .time-container { display: flex; justify-content: space-between; width: 100px; font-size: 7px; opacity: 0.5; margin-bottom: 2px; }
+        .phys-btn { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 50%; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+        .side-btn { width: 22px; height: 22px; font-size: 8px; }
+        .main-btn { width: 32px; height: 32px; font-size: 11px; }
+
+        .show-ui { opacity: 1 !important; display: flex !important; }
     </style>
 </head>
 <body>
@@ -65,20 +84,75 @@
         <source src="doorsound.mp3" type="audio/mpeg">
     </audio>
 
-    <div id="social-content">
+    <audio id="bg-music" preload="auto"></audio>
+
+    <div id="music-controls-wrapper">
+        <div id="player-container">
+            <img id="album-art" style="width:45px; border-radius:6px;">
+            <div class="time-container"><span id="time-current">0:00</span><span id="time-total">0:00</span></div>
+            <input type="range" id="music-progress" min="0" max="100" value="0">
+            <span id="display-song-name" class="song-name"></span>
+            <div style="display:flex; gap:8px;">
+                <button id="prev-btn" class="phys-btn side-btn">«</button>
+                <button id="toggle-btn" class="phys-btn main-btn">❚❚</button>
+                <button id="next-btn" class="phys-btn side-btn">»</button>
+            </div>
         </div>
+        <div id="volume-container">
+            <input type="range" id="volume-slider" min="0" max="1" step="0.01">
+            <span style="font-size:10px; margin-top:8px; opacity:0.5;">🔊</span>
+        </div>
+    </div>
 
     <script>
+        const playlist = [
+            { name: "Mop", file: "mop.mp3", cover: "mop.png" },
+            { name: "No Surprises", file: "nosurprise.mp3", cover: "nosurprise.png" },
+            { name: "Sloppy Joe", file: "sloppyjoe.mp3", cover: "sloppyjoe.png" },
+            { name: "Venus as a Boy", file: "venusasaboy.mp3", cover: "venusasaboy.png" }
+        ];
+
         const doorVid = document.getElementById('door-video');
         const whiteVid = document.getElementById('whitespace-video');
         const doorSound = document.getElementById('door-sound');
-        const socialContent = document.getElementById('social-content');
-        const fsToggle = document.getElementById('fs-toggle');
+        const musicUI = document.getElementById('music-controls-wrapper');
+        const audio = document.getElementById('bg-music');
+        const albumArt = document.getElementById('album-art');
+        const songNameDisplay = document.getElementById('display-song-name');
+        const toggleBtn = document.getElementById('toggle-btn');
+        const volSlider = document.getElementById('volume-slider');
+        const musicProgress = document.getElementById('music-progress');
 
+        let currentTrackIndex = parseInt(localStorage.getItem('socialTrackIndex')) || 0;
         let soundTriggered = false;
 
-        // Sped up whitespace video
-        whiteVid.playbackRate = 1.5;
+        function formatTime(secs) {
+            const min = Math.floor(secs / 60);
+            const sec = Math.floor(secs % 60);
+            return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+        }
+
+        function loadTrack(index, startTime = 0) {
+            currentTrackIndex = index;
+            localStorage.setItem('socialTrackIndex', index);
+            const track = playlist[index];
+            audio.src = track.file;
+            albumArt.src = track.cover;
+            songNameDisplay.innerText = track.name;
+            audio.currentTime = startTime;
+
+            const savedVol = localStorage.getItem('globalVolume') || 0.5;
+            audio.volume = savedVol;
+            volSlider.value = savedVol;
+
+            if (localStorage.getItem('socialIsPaused') === 'true') {
+                audio.pause();
+                toggleBtn.innerHTML = '▶';
+            } else {
+                audio.play();
+                toggleBtn.innerHTML = '❚❚';
+            }
+        }
 
         function fadeAudioIn(audioElement) {
             audioElement.volume = 0;
@@ -88,10 +162,8 @@
                 if (vol < 1) {
                     vol += 0.05;
                     audioElement.volume = Math.min(vol, 1);
-                } else {
-                    clearInterval(interval);
-                }
-            }, 100); // Fades in over 2 seconds
+                } else { clearInterval(interval); }
+            }, 100);
         }
 
         doorVid.ontimeupdate = () => {
@@ -106,32 +178,70 @@
         doorVid.onended = () => {
             whiteVid.play();
             doorVid.style.opacity = '0';
-            
             setTimeout(() => {
                 whiteVid.style.opacity = '1';
-                socialContent.style.opacity = '1';
+                musicUI.classList.add('show-ui');
+                loadTrack(currentTrackIndex);
             }, 100);
-
-            setTimeout(() => {
-                doorVid.style.display = 'none';
-            }, 1600);
+            setTimeout(() => { doorVid.style.display = 'none'; }, 1600);
         };
 
-        fsToggle.onclick = () => {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen();
+        toggleBtn.onclick = () => {
+            if (audio.paused) {
+                audio.play();
+                toggleBtn.innerHTML = '❚❚';
+                localStorage.setItem('socialIsPaused', 'false');
             } else {
-                document.exitFullscreen();
+                audio.pause();
+                toggleBtn.innerHTML = '▶';
+                localStorage.setItem('socialIsPaused', 'true');
             }
         };
 
+        document.getElementById('next-btn').onclick = () => loadTrack((currentTrackIndex + 1) % playlist.length);
+        document.getElementById('prev-btn').onclick = () => loadTrack((currentTrackIndex - 1 + playlist.length) % playlist.length);
+        
+        volSlider.oninput = (e) => {
+            audio.volume = e.target.value;
+            localStorage.setItem('globalVolume', e.target.value);
+        };
+        
+        audio.ontimeupdate = () => {
+            if (audio.duration) {
+                musicProgress.value = (audio.currentTime / audio.duration) * 100;
+                document.getElementById('time-current').innerText = formatTime(audio.currentTime);
+                document.getElementById('time-total').innerText = formatTime(audio.duration);
+                localStorage.setItem('socialMusicTime', audio.currentTime);
+            }
+        };
+
+        musicProgress.oninput = () => {
+            audio.currentTime = (musicProgress.value / 100) * audio.duration;
+        };
+
+        // Fullscreen Toggle
+        document.getElementById('fs-toggle').onclick = () => {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+            else document.exitFullscreen();
+        };
+
+        // Persistent Refresh Logic
         window.addEventListener('load', () => {
-            if (doorVid.paused) {
-                doorVid.play().catch(() => {
-                    doorVid.style.display = 'none';
-                    whiteVid.style.opacity = '1';
-                    whiteVid.play();
-                });
+            if (performance.navigation.type === 1) { // If refreshed
+                doorVid.style.display = 'none';
+                whiteVid.style.opacity = '1';
+                whiteVid.play();
+                musicUI.classList.add('show-ui');
+                const savedTime = parseFloat(localStorage.getItem('socialMusicTime')) || 0;
+                loadTrack(currentTrackIndex, savedTime);
+            } else {
+                if (doorVid.paused) {
+                    doorVid.play().catch(() => {
+                        doorVid.style.display = 'none';
+                        whiteVid.style.opacity = '1';
+                        whiteVid.play();
+                    });
+                }
             }
         });
     </script>
