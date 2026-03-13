@@ -38,12 +38,12 @@
             width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;
         }
 
-        /* SOCIAL LINKS SECTION - FIXED HORIZONTAL ALIGNMENT */
+        /* SOCIAL LINKS SECTION - TIGHTER VERTICAL SPACING */
         #social-container {
             position: relative; z-index: 50; display: none;
             flex-direction: column; align-items: center; 
-            gap: 10px; /* Tighter vertical gap */
-            padding: 50px 80px; border-radius: 35px; border: 1px solid rgba(255, 255, 255, 0);
+            gap: 2px; /* Much tighter vertical gap */
+            padding: 40px 80px; border-radius: 35px; border: 1px solid rgba(255, 255, 255, 0);
             transition: background 1.2s ease, border 1.2s ease, backdrop-filter 1.2s ease;
         }
         
@@ -56,12 +56,13 @@
 
         .social-row {
             display: flex; 
-            align-items: center; /* This forces icon and text to align perfectly on their centers */
+            align-items: center; 
             justify-content: center;
             text-decoration: none; 
             width: 100%;
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            opacity: 0; /* Hidden initially for animation */
+            opacity: 0;
+            height: 70px; /* Constrains the row height to keep them close */
         }
 
         .social-row:hover { transform: scale(1.1); }
@@ -73,7 +74,7 @@
         }
 
         .social-text {
-            height: 60px; /* Large text PNGs */
+            height: 60px; 
             width: auto; 
             opacity: 0; 
             margin-left: 20px;
@@ -135,23 +136,23 @@
     </div>
 
     <div id="social-container">
-        <a href="https://www.instagram.com/prath4mfr/" class="social-row">
+        <a href="https://www.instagram.com/prath4mfr/" target="_blank" class="social-row">
             <img src="instagramicon.png" class="social-icon">
             <img src="instagram.png" class="social-text">
         </a>
-        <a href="https://open.spotify.com/user/s9s8a7ps81ln4nzxvxtfcp0yw?si=167602c5d3904a48" class="social-row">
+        <a href="https://open.spotify.com/user/s9s8a7ps81ln4nzxvxtfcp0yw?si=167602c5d3904a48" target="_blank" class="social-row">
             <img src="spotifyicon.png" class="social-icon">
             <img src="spotify.png" class="social-text">
         </a>
-        <a href="https://in.pinterest.com/Prath4mfr/" class="social-row">
+        <a href="https://in.pinterest.com/Prath4mfr/" target="_blank" class="social-row">
             <img src="pinteresticon.png" class="social-icon">
             <img src="pinterest.png" class="social-text">
         </a>
-        <a href="https://x.com/PrathamPoswal" class="social-row">
+        <a href="https://x.com/PrathamPoswal" target="_blank" class="social-row">
             <img src="xicon.png" class="social-icon">
             <img src="x.png" class="social-text">
         </a>
-        <a href="https://www.reddit.com/user/EstablishmentRich970/" class="social-row">
+        <a href="https://www.reddit.com/user/EstablishmentRich970/" target="_blank" class="social-row">
             <img src="redditicon.png" class="social-icon">
             <img src="reddit.png" class="social-text">
         </a>
@@ -204,6 +205,7 @@
 
         let currentTrackIndex = parseInt(localStorage.getItem('socialTrackIndex')) || 0;
         let soundTriggered = false;
+        let isRefreshed = false;
 
         function formatTime(secs) {
             const min = Math.floor(secs / 60); const sec = Math.floor(secs % 60);
@@ -237,12 +239,10 @@
                 const icon = row.querySelector('.social-icon');
                 const text = row.querySelector('.social-text');
                 
-                // 1. Rows fade in one by one in the center
                 setTimeout(() => {
                     row.style.opacity = '1';
                     row.style.transform = 'scale(1)';
                     
-                    // 2. After they are all in, slide the icons left and show text
                     setTimeout(() => {
                         icon.style.transform = 'translateX(-60px)';
                         setTimeout(() => { 
@@ -258,7 +258,8 @@
         }
 
         doorVid.ontimeupdate = () => {
-            if (doorVid.duration && (doorVid.duration - doorVid.currentTime <= 12)) {
+            // Only play door sound if we aren't skipping the door video (not refreshed)
+            if (!isRefreshed && doorVid.duration && (doorVid.duration - doorVid.currentTime <= 12)) {
                 if (!soundTriggered) { fadeAudioIn(doorSound); soundTriggered = true; }
             }
         };
@@ -305,11 +306,15 @@
 
         window.addEventListener('load', () => {
             if (performance.navigation.type === 1) { 
+                isRefreshed = true;
                 doorVid.style.display = 'none'; whiteVid.style.opacity = '1'; whiteVid.play();
                 musicUI.classList.add('show-ui'); loadTrack(currentTrackIndex, parseFloat(localStorage.getItem('socialMusicTime')) || 0);
                 startSocialAnimation();
             } else if (doorVid.paused) {
-                doorVid.play().catch(() => { doorVid.style.display = 'none'; whiteVid.style.opacity = '1'; whiteVid.play(); });
+                doorVid.play().catch(() => { 
+                    isRefreshed = true;
+                    doorVid.style.display = 'none'; whiteVid.style.opacity = '1'; whiteVid.play(); 
+                });
             }
         });
     </script>
