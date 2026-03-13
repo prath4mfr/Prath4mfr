@@ -45,8 +45,6 @@
             gap: 2px; 
             padding: 40px 80px; border-radius: 35px; 
             border: 1px solid rgba(255, 255, 255, 0.1);
-            /* This variable handles the glow color dynamically */
-            --glow-color: rgba(255, 255, 255, 0.2);
             transition: background 1.2s ease, border 0.6s ease, backdrop-filter 1.2s ease, box-shadow 0.6s ease;
         }
         
@@ -54,16 +52,9 @@
             background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--glow-color) !important;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.05), inset 0 0 15px var(--glow-color);
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
         }
-
-        /* When a row is hovered, the parent container changes its glow variable */
-        #social-container:has(.insta-hover:hover) { --glow-color: rgba(225, 48, 108, 0.4); }
-        #social-container:has(.spot-hover:hover) { --glow-color: rgba(30, 215, 96, 0.4); }
-        #social-container:has(.pin-hover:hover) { --glow-color: rgba(189, 8, 28, 0.4); }
-        #social-container:has(.x-hover:hover) { --glow-color: rgba(255, 255, 255, 0.4); }
-        #social-container:has(.red-hover:hover) { --glow-color: rgba(255, 69, 0, 0.4); }
 
         .social-row {
             display: flex; 
@@ -73,7 +64,7 @@
             width: 100%;
             transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
             opacity: 0;
-            height: 70px;
+            height: 90px; /* Increased height to accommodate bigger text */
         }
 
         .social-row:hover { 
@@ -88,7 +79,7 @@
         }
 
         .social-text {
-            height: 60px; 
+            height: 85px; /* Bigger Text PNGs */
             width: auto; 
             opacity: 0; 
             margin-left: 10px;
@@ -150,23 +141,23 @@
     </div>
 
     <div id="social-container">
-        <a href="https://www.instagram.com/prath4mfr/" target="_blank" class="social-row insta-hover">
+        <a href="https://www.instagram.com/prath4mfr/" target="_blank" class="social-row">
             <img src="instagramicon.png" class="social-icon">
             <img src="instagram.png" class="social-text">
         </a>
-        <a href="https://open.spotify.com/user/s9s8a7ps81ln4nzxvxtfcp0yw?si=167602c5d3904a48" target="_blank" class="social-row spot-hover">
+        <a href="https://open.spotify.com/user/s9s8a7ps81ln4nzxvxtfcp0yw?si=167602c5d3904a48" target="_blank" class="social-row">
             <img src="spotifyicon.png" class="social-icon">
             <img src="spotify.png" class="social-text">
         </a>
-        <a href="https://in.pinterest.com/Prath4mfr/" target="_blank" class="social-row pin-hover">
+        <a href="https://in.pinterest.com/Prath4mfr/" target="_blank" class="social-row">
             <img src="pinteresticon.png" class="social-icon">
             <img src="pinterest.png" class="social-text">
         </a>
-        <a href="https://x.com/PrathamPoswal" target="_blank" class="social-row x-hover">
+        <a href="https://x.com/PrathamPoswal" target="_blank" class="social-row">
             <img src="xicon.png" class="social-icon">
             <img src="x.png" class="social-text">
         </a>
-        <a href="https://www.reddit.com/user/EstablishmentRich970/" target="_blank" class="social-row red-hover">
+        <a href="https://www.reddit.com/user/EstablishmentRich970/" target="_blank" class="social-row">
             <img src="redditicon.png" class="social-icon">
             <img src="reddit.png" class="social-text">
         </a>
