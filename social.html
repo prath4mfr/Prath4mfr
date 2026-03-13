@@ -77,11 +77,27 @@
 
         let soundTriggered = false;
 
+        // Sped up whitespace video
+        whiteVid.playbackRate = 1.5;
+
+        function fadeAudioIn(audioElement) {
+            audioElement.volume = 0;
+            audioElement.play();
+            let vol = 0;
+            const interval = setInterval(() => {
+                if (vol < 1) {
+                    vol += 0.05;
+                    audioElement.volume = Math.min(vol, 1);
+                } else {
+                    clearInterval(interval);
+                }
+            }, 100); // Fades in over 2 seconds
+        }
+
         doorVid.ontimeupdate = () => {
-            // Calculate 12 seconds before the end
             if (doorVid.duration && (doorVid.duration - doorVid.currentTime <= 12)) {
                 if (!soundTriggered) {
-                    doorSound.play();
+                    fadeAudioIn(doorSound);
                     soundTriggered = true;
                 }
             }
